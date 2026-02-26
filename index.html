@@ -1,0 +1,1580 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>課堂教案：拋物線 - 看見數學的軌跡</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;700&display=swap');
+
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: #f0f6f9;
+            /* Light sky tint */
+            color: #0f172a;
+        }
+
+        .font-mono {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* --- Theme Specific Styles (Based on Image) --- */
+        .bg-theme-grid {
+            background-color: #85B8DF;
+            /* Sky Blue from image */
+            background-image:
+                linear-gradient(rgba(255, 255, 255, 0.4) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.4) 1px, transparent 1px);
+            background-size: 40px 40px;
+            background-position: center bottom;
+        }
+
+        .bg-theme-grid-light {
+            background-color: #e0f2fe;
+            background-image:
+                linear-gradient(rgba(133, 184, 223, 0.2) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(133, 184, 223, 0.2) 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        .text-shadow-hero {
+            text-shadow: 2px 4px 10px rgba(0, 0, 0, 0.25), 0px 2px 4px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Chart Container Styling Rules */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 450px;
+        }
+
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 450px;
+            }
+        }
+
+        /* Modern Nav Styling */
+        .nav-item {
+            position: relative;
+        }
+
+        .nav-item::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 3px;
+            background-color: #f97316;
+            /* orange-500 */
+            transition: width 0.3s ease;
+        }
+
+        .nav-item.active {
+            color: #0284c7;
+            /* sky-600 */
+            font-weight: 900;
+        }
+
+        .nav-item.active::after {
+            width: 100%;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #bae6fd;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #7dd3fc;
+        }
+
+        /* Sleek Animations */
+        .fade-in {
+            animation: fadeInSleek 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            opacity: 0;
+        }
+
+        @keyframes fadeInSleek {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .basketball-bounce {
+            display: inline-block;
+            animation: bounceArc 2s infinite ease-in-out;
+            transform-origin: bottom center;
+        }
+
+        @keyframes bounceArc {
+
+            0%,
+            100% {
+                transform: translateY(0) rotate(0deg);
+            }
+
+            50% {
+                transform: translateY(-30px) rotate(180deg);
+            }
+        }
+
+        /* Vending Machine Drop Animation */
+        @keyframes drop-drink {
+            0% {
+                transform: translateY(-60px) scale(0.8);
+                opacity: 0;
+            }
+
+            60% {
+                transform: translateY(10px) scale(1.1);
+                opacity: 1;
+            }
+
+            80% {
+                transform: translateY(-5px) scale(1);
+                opacity: 1;
+            }
+
+            100% {
+                transform: translateY(0) scale(1);
+                opacity: 1;
+            }
+        }
+
+        .animate-drop {
+            animation: drop-drink 0.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+        }
+
+        /* Fraction Math Styling */
+        .fraction {
+            display: inline-block;
+            vertical-align: middle;
+            margin: 0 0.2em;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .fraction>span {
+            display: block;
+            padding-top: 0.15em;
+        }
+
+        .fraction span.fdn {
+            border-top: 2px solid #334155;
+        }
+
+        .fraction span.bar {
+            display: none;
+        }
+
+        /* Range Slider Styling (Orange Theme) */
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+        }
+
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 20px;
+            width: 20px;
+            border-radius: 50%;
+            background: #f97316;
+            cursor: pointer;
+            margin-top: -8px;
+            box-shadow: 0 0 0 3px #ffffff, 0 0 0 5px rgba(249, 115, 22, 0.2);
+        }
+
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 6px;
+            cursor: pointer;
+            background: #e0f2fe;
+            border-radius: 3px;
+            border: 1px solid #bae6fd;
+        }
+    </style>
+</head>
+
+<body class="antialiased flex flex-col min-h-screen">
+
+    <!-- Sporty Navigation -->
+    <nav class="bg-white/90 backdrop-blur-md border-b border-sky-100 sticky top-0 z-50 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <div
+                        class="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center mr-3 shadow-md shadow-orange-200 border-2 border-white">
+                        <span class="text-white text-sm">🏀</span>
+                    </div>
+                    <span class="text-xl font-black text-sky-800 tracking-wide">MATH<span
+                            class="text-orange-500">.</span>COURT</span>
+                </div>
+                <div class="hidden md:flex space-x-6 items-center" id="nav-menu">
+                    <!-- Nav items injected by JS -->
+                </div>
+                <div class="flex items-center md:hidden">
+                    <button id="mobile-menu-btn"
+                        class="text-sky-600 hover:text-sky-800 focus:outline-none text-2xl font-bold">
+                        ≡
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- Mobile Nav -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-sky-100 shadow-xl absolute w-full">
+            <div class="px-4 py-3 space-y-1" id="mobile-nav-items"></div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full mb-24">
+        <div id="content-area">
+            <!-- Dynamic Content Loaded Here -->
+        </div>
+    </main>
+
+    <!-- Presentation Controls -->
+    <div
+        class="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur border-t border-sky-100 z-40 shadow-[0_-4px_15px_rgba(14,165,233,0.05)]">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <button id="btn-prev" onclick="goPrev()"
+                class="flex items-center px-4 py-2 text-sky-500 hover:text-sky-800 hover:bg-sky-50 rounded-lg transition-colors font-bold text-sm tracking-wide disabled:opacity-30 disabled:cursor-not-allowed">
+                <span class="mr-2 text-lg">←</span> 上一節
+            </button>
+            <div class="flex items-center gap-3">
+                <div class="h-2 w-32 bg-sky-100 rounded-full overflow-hidden border border-sky-200">
+                    <div id="progress-bar"
+                        class="h-full bg-orange-500 transition-all duration-500 w-1/5 shadow-[0_0_10px_rgba(249,115,22,0.8)]">
+                    </div>
+                </div>
+                <div id="progress-indicator" class="text-sm font-black text-sky-300 w-8 text-right font-mono">
+                    1/5
+                </div>
+            </div>
+            <button id="btn-next" onclick="goNext()"
+                class="flex items-center px-4 py-2 text-white bg-sky-600 hover:bg-sky-700 rounded-lg shadow-md shadow-sky-200 transition-colors font-bold text-sm tracking-wide disabled:opacity-30 disabled:cursor-not-allowed">
+                下一節 <span class="ml-2 text-lg">→</span>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // --- Data & Content ---
+        const appData = {
+            modules: [
+                { id: 'step1', title: '暖身與視野', icon: '👀' },
+                { id: 'step2', title: '軌跡模擬器', icon: '🎯' },
+                { id: 'step3', title: '籃框的限制', icon: '📏' },
+                { id: 'step4', title: '判別式解析', icon: '⚡' },
+                { id: 'step5', title: '球隊經營戰', icon: '🏆' }
+            ]
+        };
+
+        let currentIndex = 0;
+        let activeChart = null;
+
+        let parabolaState = { a: -0.5, h: 2, k: 5 };
+        let currentDiscriminant = 0;
+        let currentDomainScenario = 'A';
+
+        // --- Global Chart Setup ---
+        Chart.defaults.font.family = "'JetBrains Mono', 'Noto Sans TC', sans-serif";
+        Chart.defaults.color = '#0284c7';
+        Chart.defaults.scale.grid.color = 'rgba(255, 255, 255, 0.4)';
+        Chart.defaults.plugins.tooltip.backgroundColor = 'rgba(15, 23, 42, 0.9)';
+        Chart.defaults.plugins.tooltip.padding = 12;
+        Chart.defaults.plugins.tooltip.cornerRadius = 8;
+
+        // --- Core Logic ---
+        function init() {
+            renderNav();
+            renderStep();
+        }
+
+        function renderNav() {
+            const navContainer = document.getElementById('nav-menu');
+            const mobileNavContainer = document.getElementById('mobile-nav-items');
+
+            navContainer.innerHTML = '';
+            mobileNavContainer.innerHTML = '';
+
+            appData.modules.forEach((mod, idx) => {
+                const btn = document.createElement('button');
+                btn.className = `nav-item pb-1 text-base font-bold transition-colors duration-200 ${currentIndex === idx ? 'active text-sky-700' : 'text-slate-400 hover:text-sky-600'}`;
+                btn.innerHTML = `<span class="mr-1">${mod.icon}</span> ${mod.title}`;
+                btn.onclick = () => { currentIndex = idx; renderStep(); renderNav(); };
+                navContainer.appendChild(btn);
+
+                const mBtn = document.createElement('button');
+                mBtn.className = `block w-full text-left px-4 py-3 rounded-xl text-base font-bold ${currentIndex === idx ? 'bg-sky-50 text-sky-600 border border-sky-100' : 'text-slate-500 hover:bg-slate-50'}`;
+                mBtn.innerHTML = `<span class="mr-2">${mod.icon}</span> ${mod.title}`;
+                mBtn.onclick = () => {
+                    currentIndex = idx;
+                    renderStep();
+                    renderNav();
+                    document.getElementById('mobile-menu').classList.add('hidden');
+                };
+                mobileNavContainer.appendChild(mBtn);
+            });
+
+            document.getElementById('btn-prev').disabled = currentIndex === 0;
+            document.getElementById('btn-next').disabled = currentIndex === appData.modules.length - 1;
+            document.getElementById('progress-indicator').textContent = `${currentIndex + 1}/${appData.modules.length}`;
+            document.getElementById('progress-bar').style.width = `${((currentIndex + 1) / appData.modules.length) * 100}%`;
+        }
+
+        document.getElementById('mobile-menu-btn').onclick = () => {
+            document.getElementById('mobile-menu').classList.toggle('hidden');
+        };
+
+        function goNext() { if (currentIndex < appData.modules.length - 1) { currentIndex++; renderStep(); renderNav(); } }
+        function goPrev() { if (currentIndex > 0) { currentIndex--; renderStep(); renderNav(); } }
+
+        function renderStep() {
+            const container = document.getElementById('content-area');
+            container.innerHTML = '';
+            container.classList.remove('fade-in');
+            void container.offsetWidth;
+            container.classList.add('fade-in');
+
+            if (activeChart) { activeChart.destroy(); activeChart = null; }
+
+            const stepId = appData.modules[currentIndex].id;
+            switch (stepId) {
+                case 'step1': renderStep1(container); break;
+                case 'step2': renderStep2(container); break;
+                case 'step3': renderStep3(container); break;
+                case 'step4': renderStep4(container); break;
+                case 'step5': renderStep5(container); break;
+            }
+        }
+
+        // --- Components ---
+        const TeacherNote = (content) => `
+            <div class="mb-8 border-l-4 border-orange-500 bg-white p-5 shadow-sm rounded-r-xl relative overflow-hidden">
+                <div class="absolute -right-4 -top-4 text-6xl opacity-5">📋</div>
+                <div class="flex items-center gap-2 mb-3">
+                    <span class="bg-orange-100 text-orange-600 text-xs px-2 py-1 rounded-md font-black tracking-widest uppercase border border-orange-200">Coach Notes // 教練戰術板</span>
+                </div>
+                <div class="text-slate-700 text-sm leading-relaxed font-medium">${content}</div>
+            </div>
+        `;
+
+        // --- Global Toggle Answer Function ---
+        window.toggleAnswer = function (btn) {
+            const answerDiv = btn.nextElementSibling;
+            const isHidden = answerDiv.classList.contains('hidden');
+            const theme = btn.getAttribute('data-theme') || 'sky';
+
+            const skyClasses = ['bg-sky-100', 'text-sky-700', 'hover:bg-sky-200'];
+            const orangeClasses = ['bg-orange-100', 'text-orange-700', 'hover:bg-orange-200'];
+            const slateClasses = ['bg-slate-100', 'text-slate-700', 'hover:bg-slate-200'];
+            const activeClasses = ['bg-slate-200', 'text-slate-600', 'hover:bg-slate-300'];
+
+            let themeClasses = slateClasses;
+            if (theme === 'sky') themeClasses = skyClasses;
+            if (theme === 'orange') themeClasses = orangeClasses;
+
+            if (isHidden) {
+                answerDiv.classList.remove('hidden');
+                answerDiv.classList.add('fade-in');
+                btn.innerHTML = '🙈 隱藏解答';
+                btn.classList.remove(...themeClasses);
+                btn.classList.add(...activeClasses);
+            } else {
+                answerDiv.classList.add('hidden');
+                answerDiv.classList.remove('fade-in');
+                btn.innerHTML = '👁️ 顯示解答';
+                btn.classList.remove(...activeClasses);
+                btn.classList.add(...themeClasses);
+            }
+        };
+
+        // --- Render Content Functions ---
+
+        function renderStep1(container) {
+            container.innerHTML = `
+                <div class="max-w-5xl mx-auto space-y-8">
+                    
+                    <!-- HERO SECTION -->
+                    <div class="bg-theme-grid rounded-[2rem] overflow-hidden shadow-2xl relative h-72 md:h-96 flex flex-col justify-center items-center border-[6px] border-white z-10">
+                        <div class="absolute inset-0 bg-gradient-to-t from-sky-900/30 to-transparent"></div>
+                        <!-- Ball Animation -->
+                        <div class="absolute left-[20%] md:left-[30%] bottom-1/4">
+                            <span class="text-5xl md:text-7xl basketball-bounce drop-shadow-xl">🏀</span>
+                        </div>
+                        <!-- Texts -->
+                        <div class="relative z-20 text-center mt-8">
+                            <h1 class="text-5xl md:text-[5rem] font-black text-white tracking-widest text-shadow-hero mb-4 leading-tight">拋物線：<br class="md:hidden">看見數學的軌跡</h1>
+                            <p class="text-xl md:text-3xl font-bold text-white text-shadow-hero tracking-wide">從投籃到舞台設計，解開二次函數的秘密</p>
+                        </div>
+                    </div>
+
+                    ${TeacherNote(`
+                        <ul class="list-disc pl-5 space-y-2">
+                            <li><strong>建立直覺：</strong>在教代數符號之前，先用生活中的「販賣機」與「球員」引導學生理解函數的定義：「有規則的對應關係」。</li>
+                            <li><strong>互動體驗：</strong>請學生上台點擊不同的販賣機按鈕。引導他們發現：為什麼按 A2 跟 A3 掉一樣的水是合理的（多對一）？這是正常的嗎？但按 C1 隨機掉飲料就是「機器壞掉」（一對多不是函數）？</li>
+                        </ul>
+                    `)}
+
+                    <!-- 什麼是函數？生活對應區塊 -->
+                    <div class="bg-white p-8 rounded-3xl border-2 border-sky-100 shadow-lg">
+                        <h3 class="text-2xl md:text-3xl font-black text-sky-900 mb-4 flex items-center gap-3">
+                            <span class="text-3xl">🧃</span> 什麼是「函數」？生活中的對應關係
+                        </h3>
+                        <p class="text-base text-slate-600 font-bold mb-8 bg-sky-50 p-4 rounded-xl border border-sky-100">
+                            數學上的「函數 (Function)」聽起來很抽象，但它其實就像是一台<strong class="text-orange-600">「正常運作的機器」</strong>。<br>
+                            記住函數運作的鐵則：<strong class="bg-white px-2 py-0.5 rounded shadow-sm text-sky-700 border border-slate-200 mt-2 inline-block">給定一個輸入 (x)，必定只會得到一個明確的輸出 (y)</strong>。
+                        </p>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-center">
+                            <!-- Concept 1 -->
+                            <div class="bg-slate-50 p-5 rounded-2xl border-2 border-slate-200 shadow-sm">
+                                <div class="text-4xl mb-3 drop-shadow-sm h-10 flex items-center justify-center">🥤</div>
+                                <h4 class="font-black text-slate-800 text-lg mb-2">一對一 (是函數)</h4>
+                                <p class="text-sm text-slate-500 font-bold mb-4">專屬按鈕 ➔ 專屬飲料</p>
+                                <div class="flex justify-center items-center gap-2 text-slate-600 font-mono text-sm font-bold">
+                                    <span class="bg-white px-2 py-1.5 rounded-lg shadow border border-slate-200">按鈕 A1</span> <span class="text-orange-500">➔</span> <span class="bg-white px-2 py-1.5 rounded-lg shadow border border-slate-200">運動飲料</span>
+                                </div>
+                                <p class="text-[11px] text-slate-500 mt-5 font-bold leading-tight">一個按鈕對應一種專屬飲料，<br>最標準的正常機器！</p>
+                            </div>
+                            <!-- Concept 2 -->
+                            <div class="bg-sky-50 p-5 rounded-2xl border-2 border-sky-200 shadow-sm relative overflow-hidden">
+                                <div class="absolute top-0 right-0 w-16 h-16 bg-white opacity-20 rounded-bl-full"></div>
+                                <div class="mb-3 h-10 flex items-center justify-center">
+                                    <img src="https://images.unsplash.com/photo-1523362628745-0c100150b504?w=150&h=150&fit=crop" class="w-10 h-10 object-cover rounded-lg shadow-sm border border-sky-100" alt="礦泉水" onerror="this.outerHTML='<span class=\\'text-4xl drop-shadow-sm\\'>💧</span>'">
+                                </div>
+                                <h4 class="font-black text-sky-800 text-lg mb-2">多對一 (是函數)</h4>
+                                <p class="text-sm text-sky-600 font-bold mb-4">不同按鈕 ➔ 同種飲料</p>
+                                <div class="flex flex-col gap-1 items-center text-sky-800 font-mono text-xs font-bold">
+                                    <div class="flex items-center gap-2 w-full justify-center">
+                                        <span class="bg-white px-2 py-1 rounded shadow-sm border border-sky-100 w-16">A2</span> 
+                                        <span class="text-orange-400">↘</span>
+                                    </div>
+                                    <div class="flex items-center gap-2 w-full justify-center">
+                                        <span class="text-transparent w-16"></span> 
+                                        <span class="text-orange-500 font-black text-base">➔</span> 
+                                        <span class="bg-sky-600 text-white font-black px-2 py-1 rounded-lg shadow-md text-sm border-2 border-sky-400">礦泉水</span>
+                                    </div>
+                                    <div class="flex items-center gap-2 w-full justify-center">
+                                        <span class="bg-white px-2 py-1 rounded shadow-sm border border-sky-100 w-16">B2</span> 
+                                        <span class="text-orange-400">↗</span>
+                                    </div>
+                                </div>
+                                <p class="text-[11px] text-sky-600 mt-2 font-bold leading-tight">熱銷商品放多個軌道很正常！<br>只要結果能確定，就是函數。</p>
+                            </div>
+                            <!-- Concept 3 -->
+                            <div class="bg-rose-50 p-5 rounded-2xl border-2 border-rose-200 shadow-sm relative overflow-hidden">
+                                <div class="absolute top-3 right-3 text-rose-500 font-black text-xs border-2 border-rose-300 px-2 py-0.5 rounded-lg bg-white shadow-sm rotate-12">NG</div>
+                                <div class="text-4xl mb-3 drop-shadow-sm h-10 flex items-center justify-center">💥</div>
+                                <h4 class="font-black text-rose-800 text-lg mb-2">一對多 (<span class="text-rose-600 underline">不是</span>函數)</h4>
+                                <p class="text-sm text-rose-600 font-bold mb-4">同一按鈕 ➔ 同時掉出多樣</p>
+                                <div class="flex justify-center items-center gap-2 text-rose-800 font-mono text-xs font-bold">
+                                    <span class="bg-white px-2 py-2 rounded-lg shadow-sm border border-rose-100 whitespace-nowrap">按鈕 C1</span> <span class="text-rose-400 text-base">➔</span> 
+                                    <div class="flex flex-col gap-1.5">
+                                        <span class="bg-white px-3 py-1.5 rounded shadow-sm border border-rose-100 text-slate-600 text-base">🥤 + ☕</span>
+                                    </div>
+                                </div>
+                                <p class="text-[11px] text-rose-500 mt-3 font-bold leading-tight bg-white/50 p-1.5 rounded">按下一個按鈕，竟然同時掉出兩種飲料！<br>輸出結果不唯一，代表機器故障，這不是函數。</p>
+                            </div>
+                            <!-- Concept 4 -->
+                            <div class="bg-stone-50 p-5 rounded-2xl border-2 border-stone-200 shadow-sm relative overflow-hidden">
+                                <div class="absolute top-3 right-3 text-stone-500 font-black text-xs border-2 border-stone-300 px-2 py-0.5 rounded-lg bg-white shadow-sm rotate-12">NG</div>
+                                <div class="text-4xl mb-3 drop-shadow-sm h-10 flex items-center justify-center">💸</div>
+                                <h4 class="font-black text-stone-800 text-lg mb-2">一對無 (<span class="text-stone-600 underline">不是</span>函數)</h4>
+                                <p class="text-sm text-stone-600 font-bold mb-4">有輸入 ➔ 卻沒輸出</p>
+                                <div class="flex justify-center items-center gap-2 text-stone-800 font-mono text-xs font-bold">
+                                    <span class="bg-white px-2 py-2 rounded-lg shadow-sm border border-stone-100 whitespace-nowrap">按鈕 C2</span> <span class="text-stone-400 text-base">➔</span> 
+                                    <div class="flex flex-col gap-1.5">
+                                        <span class="bg-white px-4 py-1.5 rounded shadow-sm border border-stone-200 text-stone-400 font-sans italic">... 空 ...</span>
+                                    </div>
+                                </div>
+                                <p class="text-[11px] text-stone-500 mt-3 font-bold leading-tight bg-white/50 p-1.5 rounded">投幣按了按鈕卻不給飲料，機器吃錢啦！<br>有輸入(x)卻無輸出(y)，這不是函數。</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 互動販賣機區塊 -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        
+                        <!-- THE VENDING MACHINE UI -->
+                        <div class="bg-white p-8 rounded-3xl border-2 border-sky-100 shadow-lg flex flex-col justify-center items-center relative overflow-hidden">
+                            <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-sky-400 to-orange-400"></div>
+                            <h3 class="text-xl font-black text-sky-800 mb-8 self-start flex items-center gap-2"><span class="text-2xl">🕹️</span> 球場專屬販賣機</h3>
+                            
+                            <div class="flex justify-center w-full">
+                                <div class="bg-sky-900 w-80 rounded-t-3xl rounded-b-xl border-8 border-sky-800 p-4 shadow-2xl relative">
+                                    <!-- Top Sign -->
+                                    <div class="bg-slate-800 text-sky-400 text-center font-black font-mono tracking-widest py-1 mb-4 rounded border border-slate-600 text-sm shadow-inner flex items-center justify-center gap-2">
+                                        <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div> MATH VENDOR
+                                    </div>
+                                    
+                                    <!-- Glass Window (Products) -->
+                                    <div class="bg-sky-100 rounded-xl p-3 grid grid-cols-3 gap-2 border-4 border-slate-500 shadow-inner h-48 relative">
+                                        <div class="absolute inset-0 bg-white opacity-20 pointer-events-none rounded-xl" style="background: linear-gradient(135deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0) 50%);"></div>
+                                        
+                                        <!-- Items Row 1 -->
+                                        <div class="flex flex-col items-center justify-end border-b-4 border-slate-300 pb-1 h-[70px]">
+                                            <span class="text-3xl drop-shadow-md mb-1">🥤</span>
+                                            <span class="bg-slate-800 text-white text-[9px] font-mono px-1 rounded mt-auto">A1 $25</span>
+                                        </div>
+                                        <div class="flex flex-col items-center justify-end border-b-4 border-slate-300 pb-1 h-[70px]">
+                                            <img src="https://images.unsplash.com/photo-1523362628745-0c100150b504?w=100&h=100&fit=crop" class="w-8 h-8 object-cover rounded-md shadow-sm mb-1" alt="礦泉水" onerror="this.outerHTML='<span class=\\'text-3xl drop-shadow-md mb-1\\'>💧</span>'">
+                                            <span class="bg-slate-800 text-white text-[9px] font-mono px-1 rounded mt-auto">A2 $20</span>
+                                        </div>
+                                        <div class="flex flex-col items-center justify-end border-b-4 border-slate-300 pb-1 h-[70px]">
+                                            <span class="text-3xl drop-shadow-md mb-1">🧃</span>
+                                            <span class="bg-slate-800 text-white text-[9px] font-mono px-1 rounded mt-auto">A3 $20</span>
+                                        </div>
+                                        
+                                        <!-- Items Row 2 (沒有故障或售完標籤，看起來完全正常) -->
+                                        <div class="flex flex-col items-center justify-end border-b-4 border-slate-300 pb-1 h-[70px]">
+                                            <img src="https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=100&h=100&fit=crop" class="w-8 h-8 object-cover rounded-md shadow-sm mb-1" alt="可樂" onerror="this.outerHTML='<span class=\\'text-3xl drop-shadow-md mb-1\\'>🥫</span>'">
+                                            <span class="bg-slate-800 text-white text-[9px] font-mono px-1 rounded mt-auto">B1 $35</span>
+                                        </div>
+                                        <div class="flex flex-col items-center justify-end border-b-4 border-slate-300 pb-1 h-[70px]">
+                                            <span class="text-3xl drop-shadow-md mb-1">☕</span>
+                                            <span class="bg-slate-800 text-white text-[9px] font-mono px-1 rounded mt-auto">C1 $30</span>
+                                        </div>
+                                        <div class="flex flex-col items-center justify-end border-b-4 border-slate-300 pb-1 h-[70px]">
+                                            <span class="text-3xl drop-shadow-md mb-1">�</span>
+                                            <span class="bg-slate-800 text-white text-[9px] font-mono px-1 rounded mt-auto">C2 $20</span>
+                                        </div>
+                                    </div>
+
+                                    <!-- Panel & Keypad -->
+                                    <div class="flex justify-between mt-4 items-start px-1 gap-3">
+                                        <!-- Coin slot & Status -->
+                                        <div class="flex flex-col items-center gap-2 mt-1">
+                                            <div class="w-2 h-10 bg-black rounded-full border-2 border-slate-600 shadow-inner"></div>
+                                            <div id="vending-status" class="w-3 h-3 rounded-full bg-green-500 shadow-[0_0_8px_#22c55e] transition-colors duration-300 mt-2"></div>
+                                        </div>
+
+                                        <!-- Keypad - 3x2 Grid -->
+                                        <div class="grid grid-cols-3 gap-1.5 bg-slate-700 p-2.5 rounded-lg border-2 border-slate-600 flex-grow">
+                                            <button onclick="vendItem('A1')" class="bg-slate-200 hover:bg-white active:bg-slate-400 text-slate-800 font-mono font-bold py-1 px-1 rounded shadow transition-colors text-[10px] leading-tight">A1<br><span class="text-orange-600">$25</span></button>
+                                            <button onclick="vendItem('A2')" class="bg-slate-200 hover:bg-white active:bg-slate-400 text-slate-800 font-mono font-bold py-1 px-1 rounded shadow transition-colors text-[10px] leading-tight">A2<br><span class="text-orange-600">$20</span></button>
+                                            <button onclick="vendItem('A3')" class="bg-slate-200 hover:bg-white active:bg-slate-400 text-slate-800 font-mono font-bold py-1 px-1 rounded shadow transition-colors text-[10px] leading-tight">A3<br><span class="text-orange-600">$20</span></button>
+                                            <button onclick="vendItem('B1')" class="bg-slate-200 hover:bg-white active:bg-slate-400 text-slate-800 font-mono font-bold py-1 px-1 rounded shadow transition-colors text-[10px] leading-tight">B1<br><span class="text-orange-600">$35</span></button>
+                                            <button onclick="vendItem('C1')" class="bg-slate-200 hover:bg-white active:bg-slate-400 text-slate-800 font-mono font-bold py-1 px-1 rounded shadow transition-colors text-[10px] leading-tight">C1<br><span class="text-orange-600">$30</span></button>
+                                            <button onclick="vendItem('C2')" class="bg-slate-200 hover:bg-white active:bg-slate-400 text-slate-800 font-mono font-bold py-1 px-1 rounded shadow transition-colors text-[10px] leading-tight">C2<br><span class="text-orange-600">$20</span></button>
+                                        </div>
+                                    </div>
+
+                                    <!-- Output Tray -->
+                                    <div class="bg-slate-950 mt-5 h-20 rounded-lg border-t-8 border-slate-700 shadow-inner flex items-center justify-center relative overflow-hidden">
+                                        <!-- Flap -->
+                                        <div class="absolute top-0 w-full h-2 bg-black opacity-30"></div>
+                                        <div id="vending-output" class="flex items-center justify-center w-full h-full">
+                                            <!-- Item drops here -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Live Explanation Log -->
+                        <div class="bg-gradient-to-br from-orange-50 to-white p-8 rounded-3xl border-2 border-orange-100 flex flex-col h-full shadow-md">
+                            <h4 class="font-black text-orange-600 uppercase tracking-widest text-sm mb-4 border-b-2 border-orange-200 pb-2">系統分析紀錄 (Function Log)</h4>
+                            <div id="vending-log" class="min-h-[180px] flex items-center h-full">
+                                <div class="text-slate-400 font-medium text-sm text-center w-full bg-white py-10 rounded-xl border border-dashed border-orange-200 shadow-sm">
+                                    👈 請點擊左側販賣機鍵盤進行測試<br>
+                                    <span class="text-xs mt-2 block font-bold text-orange-400">觀察按鈕輸入 (x) 與 掉落飲料 (y) 的關係</span>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    
+                    <!-- 代數轉換區塊 -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8">
+                        <div class="bg-white p-8 rounded-3xl border-2 border-sky-100 shadow-lg flex flex-col justify-center items-center relative overflow-hidden">
+                            <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-sky-400 to-orange-400"></div>
+                            <h3 class="text-xl font-black text-sky-800 mb-8 self-start flex items-center gap-2"><span class="text-2xl">💻</span> 數值函數分析機</h3>
+                            
+                            <div class="flex flex-col md:flex-row items-center justify-center gap-6 w-full">
+                                <div class="flex flex-col items-center bg-sky-50 p-4 rounded-xl border border-sky-100">
+                                    <label class="text-xs font-black text-sky-500 mb-2 uppercase tracking-widest">投入數值 (x)</label>
+                                    <input type="number" id="machine-input" value="2" class="w-20 text-center text-2xl font-black font-mono p-2 border-b-4 border-orange-400 bg-transparent focus:border-sky-500 focus:outline-none transition-colors text-slate-800">
+                                </div>
+                                
+                                <button onclick="runNumericalMachine()" class="bg-orange-500 hover:bg-orange-600 text-white p-3 rounded-full shadow-lg shadow-orange-500/40 transition-transform hover:scale-110 active:scale-95 z-10" title="執行分析">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                                </button>
+
+                                <div class="bg-slate-800 text-white p-5 rounded-2xl shadow-xl border-4 border-sky-900 relative w-48 h-32 flex flex-col items-center justify-center group">
+                                    <div class="absolute top-2 left-3 text-[10px] text-sky-400 font-mono tracking-widest font-bold">FUNC: f(x) = x²-4x+5</div>
+                                    <div class="text-4xl font-mono font-black text-orange-400 tracking-tighter mt-2">f(x)</div>
+                                    <div id="machine-process" class="absolute bottom-3 text-white font-mono text-xs opacity-0 transition-opacity duration-300 bg-sky-600/50 px-2 rounded">calculating...</div>
+                                </div>
+
+                                <div class="text-sky-300 hidden md:block">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                                </div>
+
+                                <div class="flex flex-col items-center bg-sky-50 p-4 rounded-xl border border-sky-100">
+                                    <label class="text-xs font-black text-sky-500 mb-2 uppercase tracking-widest">輸出結果 f(x)</label>
+                                    <div id="machine-output" class="w-20 h-[52px] flex items-center justify-center text-3xl font-mono font-black text-slate-300 border-b-4 border-dashed border-slate-300 transition-all duration-300">
+                                        ?
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Discussion Panel -->
+                        <div class="bg-gradient-to-br from-orange-50 to-white p-8 rounded-3xl border-2 border-orange-100 flex flex-col justify-center shadow-md">
+                            <h3 class="text-lg font-black text-orange-600 tracking-widest mb-6 border-b-2 border-orange-200 pb-2 flex items-center gap-2"><span>🗣️</span> 團隊討論</h3>
+                            <ul class="space-y-6 text-slate-700 text-base font-medium">
+                                <li class="bg-white p-4 rounded-xl shadow-sm border border-orange-50">
+                                    <span class="block font-black text-orange-600 mb-1">Q1. 轉換為代數</span>
+                                    當我們說「這台機器能把輸入的數字處理後吐出結果」，在數學上，這台機器的名字就叫做 <strong class="font-mono text-sky-700">f</strong>，運作規則就是 <strong class="font-mono text-sky-700">f(x)</strong>。
+                                    <div class="mt-2">
+                                        <button onclick="toggleAnswer(this)" data-theme="orange" class="mt-2 text-xs font-bold px-3 py-1 rounded-full transition-colors bg-orange-100 text-orange-700 hover:bg-orange-200">👁️ 教學提示</button>
+                                        <div class="hidden mt-2 p-3 bg-orange-50 border border-orange-200 rounded-lg text-sm text-orange-800 font-medium shadow-inner">
+                                            <strong>💡 引導重點：</strong>發明這種符號是為了清楚表達「輸入了什麼 (x)」與「得到了什麼 f(x)」。比起只寫 y = ...，寫出 f(2) = 5 能讓學生一眼看出輸入值是 2，這對後續理解函數定義域非常有幫助！
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="bg-white p-4 rounded-xl shadow-sm border border-orange-50">
+                                    <span class="block font-black text-orange-600 mb-1">Q2. 逆向運算</span>
+                                    如果我們希望機器最後吐出的結果剛好是 <strong class="text-sky-600 font-mono text-xl">5</strong>，請問一開始投入的數值 (x) 應該設定多少？<br>
+                                    <span class="text-xs text-slate-400 mt-2 block font-bold">💡 提示：答案剛好印證了「多對一」也是函數喔！</span>
+                                    <div class="mt-2">
+                                        <button onclick="toggleAnswer(this)" data-theme="orange" class="mt-2 text-xs font-bold px-3 py-1 rounded-full transition-colors bg-orange-100 text-orange-700 hover:bg-orange-200">👁️ 顯示解答</button>
+                                        <div class="hidden mt-2 p-3 bg-orange-50 border border-orange-200 rounded-lg text-sm text-orange-800 font-medium shadow-inner">
+                                            <strong>解答：</strong>輸入 <strong class="font-mono text-lg text-sky-700">x = 0</strong> 或是 <strong class="font-mono text-lg text-sky-700">x = 4</strong> 都可以得到 5！<br>
+                                            <hr class="my-2 border-orange-200">
+                                            <strong>解析：</strong>解方程式 <code>x² - 4x + 5 = 5</code> ➔ <code>x² - 4x = 0</code> ➔ <code>x(x-4) = 0</code>。這完美展現了不同的 x (0 和 4) 卻能對應到同一個 y (5)，屬於正常的「多對一」函數對應！
+                                        </div>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderStep2(container) {
+            container.innerHTML = `
+                <div class="space-y-8 max-w-6xl mx-auto">
+                    ${TeacherNote(`
+                        <ul class="list-disc pl-5 space-y-2">
+                            <li><strong>動態展示：</strong>切換到「投籃軌跡模擬器」。讓學生觀察參數 <span class="font-mono bg-orange-100 text-orange-800 px-1 rounded">a, h, k</span> 如何完美控制拋物線。</li>
+                            <li><strong>課堂挑戰：</strong>利用右下方的任務，請學生實際上台拖曳拉桿，將籃球軌跡精準送入假想的籃框中。</li>
+                        </ul>
+                    `)}
+
+                    <div class="bg-white p-6 md:p-8 rounded-3xl shadow-lg border-2 border-sky-100 overflow-hidden relative">
+                        <!-- Decorative bg -->
+                        <div class="absolute -right-20 -top-20 w-64 h-64 bg-sky-50 rounded-full blur-3xl opacity-50 pointer-events-none"></div>
+
+                        <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-4 relative z-10">
+                            <div>
+                                <h2 class="text-3xl font-black text-sky-900 mb-1">投籃軌跡模擬器</h2>
+                                <p class="text-base text-sky-600 font-bold">動態觀察參數如何調整拋物線的幾何特徵</p>
+                            </div>
+                            <div class="text-xl md:text-3xl font-mono text-white font-black bg-slate-800 px-6 py-3 rounded-xl shadow-lg border-b-4 border-orange-500" id="equation-display">f(x) = x²</div>
+                        </div>
+
+                        <div class="grid grid-cols-1 lg:grid-cols-4 gap-8 relative z-10">
+                            <!-- Chart Area matching the Image Style (Clean Sky Blue Background for clear Cartesian Grid) -->
+                            <div class="lg:col-span-3 chart-container bg-gradient-to-b from-[#6BA5D4] to-[#85B8DF] rounded-2xl overflow-hidden border-4 border-white shadow-lg relative">
+                                <div class="absolute top-4 left-4 text-white font-black tracking-widest text-sm z-0 drop-shadow-md">COURT VIEW (X-Y)</div>
+                                <canvas id="parabolaChart" class="relative z-10"></canvas>
+                            </div>
+                            
+                            <div class="flex flex-col gap-6">
+                                <!-- Controls -->
+                                <div class="bg-slate-50 p-6 rounded-2xl border border-slate-200 shadow-inner space-y-6">
+                                    <div class="group">
+                                        <label class="flex justify-between text-xs font-black text-slate-500 uppercase tracking-widest mb-3">
+                                            <span>力道/方向 (a)</span>
+                                            <span id="val-a" class="text-orange-600 font-mono text-lg bg-white px-2 rounded shadow-sm">-0.5</span>
+                                        </label>
+                                        <input type="range" min="-3" max="3" step="0.1" value="${parabolaState.a}" id="input-a">
+                                    </div>
+                                    <div class="group">
+                                        <label class="flex justify-between text-xs font-black text-slate-500 uppercase tracking-widest mb-3">
+                                            <span>出手點水平 (h)</span>
+                                            <span id="val-h" class="text-sky-700 font-mono text-lg bg-white px-2 rounded shadow-sm">2.0</span>
+                                        </label>
+                                        <input type="range" min="-5" max="10" step="0.5" value="${parabolaState.h}" id="input-h">
+                                    </div>
+                                    <div class="group">
+                                        <label class="flex justify-between text-xs font-black text-slate-500 uppercase tracking-widest mb-3">
+                                            <span>出手最高點 (k)</span>
+                                            <span id="val-k" class="text-sky-700 font-mono text-lg bg-white px-2 rounded shadow-sm">5.0</span>
+                                        </label>
+                                        <input type="range" min="-5" max="15" step="0.5" value="${parabolaState.k}" id="input-k">
+                                    </div>
+                                    
+                                        <div class="border-t-2 border-slate-200 pt-4 mt-2 text-center">
+                                        <p class="text-xs font-black text-slate-400 uppercase tracking-widest mb-1">頂點 (最高點) Vertex</p>
+                                        <p class="text-3xl font-mono font-black text-slate-800" id="vertex-display">(2, 5)</p>
+                                    </div>
+                                </div>
+
+                                <!-- Tasks -->
+                                <div class="bg-orange-50 p-5 rounded-2xl border border-orange-200 mt-auto">
+                                    <h4 class="font-black text-orange-800 text-sm mb-3 uppercase tracking-widest flex items-center gap-2"><span class="text-xl">🏀</span> 挑戰任務</h4>
+                                    <ul class="text-sm text-slate-700 space-y-4 font-bold flex flex-col">
+                                        <li class="flex flex-col items-start">
+                                            <div class="flex items-start">
+                                                <span class="text-orange-500 mr-2 mt-0.5">▪</span> 
+                                                調整參數 (a, h, k)，讓拋物線精準空心入網 (經過紅色籃框 🎯)。
+                                            </div>
+                                            <button onclick="toggleAnswer(this)" data-theme="orange" class="ml-4 mt-2 text-xs font-bold px-3 py-1 rounded-full transition-colors bg-orange-100 text-orange-700 hover:bg-orange-200 self-start">👁️ 參考解答</button>
+                                            <div class="hidden mt-2 ml-4 p-3 bg-white border border-orange-200 rounded-lg text-xs text-slate-700 font-medium shadow-inner w-full box-border">
+                                                <strong>解答：</strong>有很多種組合，例如 <code>(a, h, k) = (-0.2, 3, 8)</code> 或 <code>(-0.5, 6, 5)</code> 等。<br>
+                                                <strong>重點條件：</strong> <code>a</code> 必須是負數（開口向下），且代入籃框座標 (8, 3) 必須能使方程式成立！
+                                            </div>
+                                        </li>
+                                        <li class="flex flex-col items-start border-t border-orange-200 pt-3">
+                                            <div class="flex items-start">
+                                                <span class="text-orange-500 mr-2 mt-0.5">▪</span> 
+                                                觀察 a = -0.5 與 a = -2，誰的軌跡比較「陡」？為什麼？
+                                            </div>
+                                            <button onclick="toggleAnswer(this)" data-theme="orange" class="ml-4 mt-2 text-xs font-bold px-3 py-1 rounded-full transition-colors bg-orange-100 text-orange-700 hover:bg-orange-200 self-start">👁️ 顯示解答</button>
+                                            <div class="hidden mt-2 ml-4 p-3 bg-white border border-orange-200 rounded-lg text-xs text-slate-700 font-medium shadow-inner w-full box-border">
+                                                <strong>解答：</strong> <code>a = -2</code> 的軌跡比較陡峭（比較瘦）！<br>
+                                                <strong>解析：</strong> 因為當 x 改變相同的距離時，乘上 2 會讓 y 值下降得更快。因此在二次函數中「a 的絕對值越大」，拋物線的開口就會越小、圖形越陡峭。
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            initParabolaChart();
+        }
+
+        function renderStep3(container) {
+            container.innerHTML = `
+                <div class="space-y-8 max-w-6xl mx-auto">
+                    ${TeacherNote(`
+                        <ul class="list-disc pl-5 space-y-2">
+                            <li><strong>核心觀念：</strong>真實世界的數學是有邊界的！就像球場有界線。切換右上角的「情境 A」與「情境 B」觀察。</li>
+                            <li><strong>高一必考陷阱：</strong>「情境 B」是經典題！當頂點 (x=2) 不在限制範圍內時，拋物線看起來就是一條斜線，最大/最小值只能在端點產生。</li>
+                        </ul>
+                    `)}
+
+                    <div class="bg-white p-6 md:p-8 rounded-3xl shadow-lg border-2 border-sky-100 relative overflow-hidden">
+                        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4 border-b-2 border-slate-100 pb-6 relative z-10">
+                            <div>
+                                <h2 class="text-3xl font-black text-sky-900 mb-2">籃框的限制：範圍下的極值</h2>
+                                <p class="text-base text-slate-500 font-bold bg-slate-100 px-3 py-1 rounded-lg inline-block font-mono">已知函數 f(x) = (x-2)² + 1</p>
+                            </div>
+                            
+                            <!-- Segmented Control -->
+                            <div class="flex bg-slate-100 p-1.5 rounded-xl border border-slate-200 shadow-inner">
+                                <button onclick="toggleDomain('A')" id="btn-scen-A" class="px-6 py-2.5 rounded-lg font-black text-sm transition-all ${currentDomainScenario === 'A' ? 'bg-orange-500 text-white shadow-md' : 'text-slate-500 hover:text-slate-800'}">基礎題型</button>
+                                <button onclick="toggleDomain('B')" id="btn-scen-B" class="px-6 py-2.5 rounded-lg font-black text-sm transition-all ${currentDomainScenario === 'B' ? 'bg-sky-600 text-white shadow-md' : 'text-slate-500 hover:text-slate-800'}">陷阱題型</button>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center relative z-10">
+                            <div class="chart-container bg-sky-50 rounded-2xl border-4 border-white shadow-lg overflow-hidden relative">
+                                <div class="absolute top-4 left-4 text-sky-800/40 font-black tracking-widest text-sm z-0">ANALYSIS VIEW</div>
+                                <canvas id="domainChart" class="relative z-10"></canvas>
+                            </div>
+                            
+                            <div class="flex flex-col justify-center">
+                                <div id="domain-explanation" class="min-h-[200px]">
+                                    <!-- Content injected by JS -->
+                                </div>
+                                
+                                <!-- New Q&A Section for Step 3 -->
+                                <div class="mt-6 bg-gradient-to-br from-slate-50 to-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                                    <h3 class="text-lg font-black text-slate-700 mb-2 flex items-center gap-2"><span>🤔</span> 隨堂思考</h3>
+                                    <p class="text-slate-600 font-medium mb-3 text-sm">如果教練把限制範圍改成 <strong class="text-sky-600 font-mono border-b-2 border-sky-300">1 ≤ x ≤ 2</strong>，請問這段期間內的「最大值」會發生在 x = 1 還是 x = 2 呢？</p>
+                                    <button onclick="toggleAnswer(this)" data-theme="slate" class="text-xs font-bold px-3 py-1 rounded-full transition-colors bg-slate-100 text-slate-700 hover:bg-slate-200">👁️ 顯示解答</button>
+                                    <div class="hidden mt-3 p-4 bg-sky-50 border border-sky-200 rounded-lg text-sm text-sky-800 font-medium shadow-inner">
+                                        <strong>解答：最大值發生在 x = 1！</strong><br><br>
+                                        <strong>解析：</strong>因為此函數開口向上，且頂點在 <code>x = 2</code>，這代表 x=2 是整個圖形的「最低點」(最小值 1)。<br>
+                                        因為拋物線是對稱的，<strong>「離頂點越遠的點，函數值就會飛得越高」</strong>。x = 1 距離頂點有 1 單位，所以它會是這個範圍內的最大值！
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            initDomainChart();
+            updateDomainUI();
+        }
+
+        function toggleDomain(scenario) {
+            currentDomainScenario = scenario;
+
+            document.getElementById('btn-scen-A').className = `px-6 py-2.5 rounded-lg font-black text-sm transition-all ${currentDomainScenario === 'A' ? 'bg-orange-500 text-white shadow-md' : 'text-slate-500 hover:text-slate-800'}`;
+            document.getElementById('btn-scen-B').className = `px-6 py-2.5 rounded-lg font-black text-sm transition-all ${currentDomainScenario === 'B' ? 'bg-sky-600 text-white shadow-md' : 'text-slate-500 hover:text-slate-800'}`;
+
+            updateDomainChartData();
+            updateDomainUI();
+        }
+
+        function updateDomainUI() {
+            const container = document.getElementById('domain-explanation');
+            if (currentDomainScenario === 'A') {
+                container.innerHTML = `
+                    <div class="fade-in space-y-6 bg-orange-50 p-6 rounded-2xl border border-orange-100">
+                        <div class="flex items-center gap-3 mb-2">
+                            <span class="px-3 py-1 bg-white text-orange-600 border border-orange-200 text-sm font-mono font-black rounded-lg shadow-sm">範圍 0 ≤ x ≤ 5</span>
+                        </div>
+                        <ul class="space-y-5 text-base text-slate-700 font-bold relative before:absolute before:inset-y-0 before:left-[15px] before:w-1 before:bg-orange-200">
+                            <li class="relative pl-10">
+                                <div class="absolute left-0 top-0.5 w-8 h-8 rounded-full bg-white border-4 border-orange-300 flex items-center justify-center text-xs font-black text-orange-600 shadow-sm">1</div>
+                                <span class="text-orange-800 block mb-1">定位頂點</span>
+                                原函數頂點為 <span class="font-mono bg-white px-2 border border-slate-200 rounded text-slate-800">x = 2</span>。
+                            </li>
+                            <li class="relative pl-10">
+                                <div class="absolute left-0 top-0.5 w-8 h-8 rounded-full bg-orange-500 border-4 border-white flex items-center justify-center text-xs font-black text-white shadow-sm">2</div>
+                                <span class="text-orange-800 block mb-1">檢查包含性 (關鍵！)</span>
+                                2 介於 0 到 5 之間，頂點在範圍內。<br>
+                                ➔ 最小值落於頂點：<strong class="text-orange-600 font-mono text-lg">f(2) = 1</strong>
+                            </li>
+                            <li class="relative pl-10">
+                                <div class="absolute left-0 top-0.5 w-8 h-8 rounded-full bg-white border-4 border-orange-300 flex items-center justify-center text-xs font-black text-orange-600 shadow-sm">3</div>
+                                <span class="text-orange-800 block mb-1">檢查端點距離</span>
+                                離對稱軸越遠，圖形飛越高。x=5 距離頂點(x=2)有 3 單位，大於 x=0。<br>
+                                ➔ 最大值落於遠端點：<strong class="text-orange-600 font-mono text-lg">f(5) = 10</strong>
+                            </li>
+                        </ul>
+                    </div>
+                `;
+            } else {
+                container.innerHTML = `
+                    <div class="fade-in space-y-6 bg-sky-50 p-6 rounded-2xl border border-sky-100">
+                        <div class="flex items-center gap-3 mb-2">
+                            <span class="px-3 py-1 bg-white text-sky-600 border border-sky-200 text-sm font-mono font-black rounded-lg shadow-sm">範圍 3 ≤ x ≤ 6</span>
+                        </div>
+                        <ul class="space-y-5 text-base text-slate-700 font-bold relative before:absolute before:inset-y-0 before:left-[15px] before:w-1 before:bg-sky-200">
+                            <li class="relative pl-10">
+                                <div class="absolute left-0 top-0.5 w-8 h-8 rounded-full bg-white border-4 border-sky-300 flex items-center justify-center text-xs font-black text-sky-600 shadow-sm">1</div>
+                                <span class="text-sky-800 block mb-1">定位頂點</span>
+                                原函數頂點為 <span class="font-mono bg-white px-2 border border-slate-200 rounded text-slate-800">x = 2</span>。
+                            </li>
+                            <li class="relative pl-10">
+                                <div class="absolute left-0 top-0.5 w-8 h-8 rounded-full bg-rose-500 border-4 border-white flex items-center justify-center text-xs font-black text-white shadow-sm">2</div>
+                                <span class="text-rose-600 block mb-1">頂點在範圍外 (陷阱！)</span>
+                                2 不介於 3 到 6 之間。<br>
+                                ➔ 由於拋物線右側是上升的，此區間內呈現「單調遞增」。
+                            </li>
+                            <li class="relative pl-10">
+                                <div class="absolute left-0 top-0.5 w-8 h-8 rounded-full bg-white border-4 border-sky-300 flex items-center justify-center text-xs font-black text-sky-600 shadow-sm">3</div>
+                                <span class="text-sky-800 block mb-1">尋找極值</span>
+                                單調遞增的特性代表：起點最低、終點最高。<br>
+                                ➔ 最小值：<strong class="text-sky-600 font-mono text-lg">f(3) = 2</strong><br>
+                                ➔ 最大值：<strong class="text-sky-600 font-mono text-lg">f(6) = 17</strong>
+                            </li>
+                        </ul>
+                    </div>
+                `;
+            }
+        }
+
+        function renderStep4(container) {
+            container.innerHTML = `
+                <div class="space-y-8 max-w-6xl mx-auto">
+                    ${TeacherNote(`
+                        <ul class="list-disc pl-5 space-y-2">
+                            <li><strong>代數幾何化：</strong>這是高中代數的核心。讓學生理解解方程式 ax² + bx + c = 0，等同於尋找圖形與 x 軸 (y=0) 的交點。</li>
+                            <li><strong>公式解連結：</strong>利用右下方的公式視窗，解釋為什麼 <strong class="text-orange-600 font-mono">Δ < 0</strong> 會無解。引導學生發現「根號內不得為負」的代數限制，在幾何上即呈現為「不相交」。</li>
+                        </ul>
+                    `)}
+
+                    <div class="bg-white p-6 md:p-8 rounded-3xl shadow-lg border-2 border-sky-100">
+                        <div class="mb-8 border-b-2 border-slate-100 pb-4">
+                            <h2 class="text-3xl font-black text-sky-900 mb-2">判別式 <span class="text-orange-500 font-mono">Δ</span>：代數與幾何的交會</h2>
+                            <p class="text-base font-bold text-slate-500">探討判別式符號如何決定拋物線與 x 軸 (海平面) 的關係</p>
+                        </div>
+
+                        <div class="flex flex-col sm:flex-row gap-4 mb-8 bg-slate-50 p-2 rounded-2xl border border-slate-200 shadow-inner">
+                            <button onclick="updateDiscriminant(0)" class="disc-btn flex-1 py-4 px-4 rounded-xl border-2 transition-all text-center group ${currentDiscriminant === 0 ? 'border-orange-500 bg-white shadow-md' : 'border-transparent hover:border-slate-300 bg-transparent'}">
+                                <div class="text-xl font-mono font-black mb-1 ${currentDiscriminant === 0 ? 'text-orange-600' : 'text-slate-500'}">Δ > 0</div>
+                                <div class="text-sm font-bold text-slate-500">兩相異實根</div>
+                            </button>
+                            <button onclick="updateDiscriminant(1)" class="disc-btn flex-1 py-4 px-4 rounded-xl border-2 transition-all text-center group ${currentDiscriminant === 1 ? 'border-orange-500 bg-white shadow-md' : 'border-transparent hover:border-slate-300 bg-transparent'}">
+                                <div class="text-xl font-mono font-black mb-1 ${currentDiscriminant === 1 ? 'text-orange-600' : 'text-slate-500'}">Δ = 0</div>
+                                <div class="text-sm font-bold text-slate-500">兩相等實根 (相切)</div>
+                            </button>
+                            <button onclick="updateDiscriminant(2)" class="disc-btn flex-1 py-4 px-4 rounded-xl border-2 transition-all text-center group ${currentDiscriminant === 2 ? 'border-orange-500 bg-white shadow-md' : 'border-transparent hover:border-slate-300 bg-transparent'}">
+                                <div class="text-xl font-mono font-black mb-1 ${currentDiscriminant === 2 ? 'text-orange-600' : 'text-slate-500'}">Δ < 0</div>
+                                <div class="text-sm font-bold text-slate-500">無實數解 (恆正/負)</div>
+                            </button>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 lg:grid-cols-5 gap-8 items-stretch">
+                             <div class="lg:col-span-3 chart-container bg-theme-grid-light rounded-2xl overflow-hidden border-4 border-white shadow-lg relative">
+                                <canvas id="deltaChart" class="relative z-10"></canvas>
+                                <!-- Fake water overlay for x-axis -->
+                                <div class="absolute bottom-0 left-0 w-full h-1/2 bg-sky-500/10 border-t-2 border-sky-400 z-0 flex justify-center">
+                                    <span class="text-sky-600 font-bold text-xs mt-1 tracking-widest bg-white/50 px-2 rounded-full h-fit">X-AXIS (y=0)</span>
+                                </div>
+                            </div>
+                            
+                            <div class="lg:col-span-2 flex flex-col gap-6">
+                                <div class="bg-slate-800 border-4 border-slate-700 p-6 rounded-2xl flex-grow shadow-xl text-white relative overflow-hidden">
+                                    <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-sky-400 to-orange-400"></div>
+                                    <h4 class="font-black text-sm uppercase tracking-widest text-sky-400 mb-4 border-b border-slate-700 pb-2 flex items-center gap-2"><span class="text-lg">📊</span> 幾何特徵</h4>
+                                    <div id="delta-details" class="space-y-4 text-base text-slate-300 font-medium">
+                                        <!-- Populated by JS -->
+                                    </div>
+                                </div>
+                                
+                                <div class="border-2 border-orange-200 p-5 rounded-2xl bg-orange-50 relative">
+                                    <div class="absolute -top-3 -right-3 bg-white border-2 border-orange-200 rounded-full w-8 h-8 flex items-center justify-center text-lg shadow-sm">💡</div>
+                                    <h4 class="font-black text-orange-800 mb-3 text-sm uppercase tracking-widest">代數觀點 (公式解)</h4>
+                                    <div class="bg-white p-4 rounded-xl flex items-center justify-center font-mono text-xl border-2 border-slate-100 mb-3 text-slate-800 font-black shadow-inner">
+                                        x = 
+                                        <div class="fraction mx-3">
+                                            <span class="num">-b ± <span id="formula-root" class="transition-colors">√<span class="bg-orange-100 px-1 border border-orange-200 rounded ml-1 text-orange-600">Δ</span></span></span>
+                                            <span class="fdn">2a</span>
+                                        </div>
+                                    </div>
+                                    <p class="text-sm font-bold text-slate-600 leading-relaxed" id="formula-explanation">
+                                        <!-- Populated dynamically -->
+                                    </p>
+                                </div>
+                            </div>
+                            
+                            <!-- Q&A Section for Step 4 -->
+                            <div class="col-span-full mt-2 bg-gradient-to-br from-orange-50 to-white p-6 rounded-2xl border border-orange-100 shadow-sm">
+                                <h3 class="text-lg font-black text-orange-800 mb-2 flex items-center gap-2"><span>🤔</span> 腦力激盪</h3>
+                                <p class="text-slate-700 font-medium mb-3">為什麼當判別式 <strong class="text-orange-600 font-mono bg-white px-2 rounded border border-orange-200">Δ &lt; 0</strong> 時，方程式會「無實數解」？請試著從上方的「公式解」來解釋！</p>
+                                <button onclick="toggleAnswer(this)" data-theme="orange" class="text-xs font-bold px-3 py-1 rounded-full transition-colors bg-orange-100 text-orange-700 hover:bg-orange-200">👁️ 顯示解答</button>
+                                <div class="hidden mt-3 p-5 bg-white border border-orange-200 rounded-xl text-sm text-slate-700 font-medium shadow-inner leading-relaxed">
+                                    <strong>解答：因為根號內不能是負數！</strong><br><br>
+                                    <strong>解析：</strong>仔細看上方的公式解，判別式 Δ 被放在<strong>「根號 (√)」</strong>裡面。在我們目前學習的實數世界中，負數是無法開根號的（因為沒有任何實數平方會等於負數）。<br>
+                                    所以當 <code>Δ < 0</code> 時，整個公式解就失去意義、算不出任何實數答案。這在幾何圖形上，就完美對應著「拋物線與 x 軸 (水面) 永遠碰不到面」的懸空恆正/恆負狀態！
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            initDeltaChart();
+            updateDiscriminant(currentDiscriminant);
+        }
+
+        function renderStep5(container) {
+            container.innerHTML = `
+                <div class="space-y-8 max-w-6xl mx-auto">
+                    ${TeacherNote(`
+                        <ul class="list-disc pl-5 space-y-2">
+                            <li><strong>總結與應用：</strong>最佳化問題是二次函數的經典應用。將拋物線的頂點概念應用在「球隊商品定價」，讓數學走出課本。</li>
+                            <li><strong>嚴謹推導：</strong>圖形提供直覺，數學講求嚴謹。點擊下方的「展開代數推導」，展示如何利用配方法找出極值的精確位置。</li>
+                        </ul>
+                    `)}
+
+                    <div class="bg-white p-6 md:p-8 rounded-3xl shadow-lg border-2 border-sky-100 relative overflow-hidden">
+                        <div class="mb-8">
+                            <h2 class="text-3xl font-black text-sky-900 mb-4 flex items-center gap-3"><span class="text-4xl">🏆</span> 球隊商品定價戰略</h2>
+                            <div class="bg-gradient-to-r from-orange-50 to-white p-5 rounded-xl border-l-4 border-orange-500 text-base text-slate-700 font-medium shadow-sm">
+                                <strong>情境：</strong>球隊聯名球衣原價 <strong class="text-sky-600 font-mono">$100</strong>，預估可賣出 <strong class="text-sky-600 font-mono">500</strong> 件。<br>市場調查顯示：<strong>每降價 $1，可多賣 10 件</strong>。如何定價才能獲得最高總收入？
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 relative z-10">
+                             <div class="lg:col-span-2 chart-container bg-slate-50 border-2 border-slate-100 rounded-2xl overflow-hidden shadow-inner">
+                                <canvas id="profitChart" class="relative z-10"></canvas>
+                            </div>
+                            
+                            <div class="flex flex-col justify-between space-y-6">
+                                <div class="bg-white p-6 rounded-2xl border-2 border-orange-100 shadow-sm">
+                                    <label class="flex justify-between items-end mb-4">
+                                        <span class="text-sm font-black text-orange-800 uppercase tracking-widest bg-orange-100 px-2 py-1 rounded">降價設定 (x)</span>
+                                        <span class="font-mono text-4xl font-black text-orange-600">$<span id="price-val">0</span></span>
+                                    </label>
+                                    <input type="range" min="0" max="60" step="1" value="0" id="price-input" class="mt-2">
+                                </div>
+                                
+                                <div class="bg-slate-800 rounded-2xl p-6 space-y-4 text-white shadow-xl relative overflow-hidden">
+                                    <div class="absolute top-0 right-0 w-16 h-16 bg-white opacity-5 rounded-bl-full"></div>
+                                    <div class="flex justify-between items-center pb-3 border-b border-slate-700">
+                                        <span class="text-slate-400 text-sm font-bold">新單價 <span class="font-mono text-xs">(100 - x)</span></span>
+                                        <span class="font-mono text-xl font-bold">$<span id="curr-price">100</span></span>
+                                    </div>
+                                    <div class="flex justify-between items-center pb-3 border-b border-slate-700">
+                                        <span class="text-slate-400 text-sm font-bold">預估銷量 <span class="font-mono text-xs">(500 + 10x)</span></span>
+                                        <span class="font-mono text-xl font-bold" id="curr-sales">500</span>
+                                    </div>
+                                    <div class="flex justify-between items-center pt-2">
+                                        <span class="font-black text-white text-base bg-orange-500 px-2 py-1 rounded">總收入</span>
+                                        <span class="font-mono text-3xl font-black text-orange-400">$<span id="curr-revenue">50,000</span></span>
+                                    </div>
+                                </div>
+                                
+                                <button onclick="toggleMathProof()" class="w-full py-4 text-base font-black text-sky-700 border-2 border-sky-200 rounded-xl hover:bg-sky-50 transition-colors flex justify-center items-center gap-2 bg-white shadow-sm">
+                                    <span id="proof-icon" class="font-mono text-lg leading-none">+</span> 展開配方法推導
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Math Proof Details -->
+                        <div id="math-proof" class="hidden mt-6 bg-slate-900 rounded-2xl p-8 shadow-inner font-mono text-slate-300 text-sm md:text-base border-4 border-slate-800">
+                            <div class="space-y-2 opacity-90 font-bold">
+                                <p><span class="text-sky-400 text-xs tracking-widest uppercase">// 設降價為 x，總收入為 f(x)</span></p>
+                                <p>f(x) = (100 - x)(500 + 10x)</p>
+                                <p>f(x) = 50000 + 1000x - 500x - 10x²</p>
+                                <p>f(x) = -10x² + 500x + 50000</p>
+                                <br>
+                                <p><span class="text-sky-400 text-xs tracking-widest uppercase">// 提出 a (-10) 準備配方法</span></p>
+                                <p>f(x) = -10(x² - 50x) + 50000</p>
+                                <br>
+                                <p><span class="text-sky-400 text-xs tracking-widest uppercase">// 括號內配上 (50/2)² = 625，外部補回 10 * 625</span></p>
+                            </div>
+                            <p class="text-white font-black mt-6 text-xl md:text-2xl border-l-4 border-orange-500 pl-4 py-2 bg-slate-800 rounded-r-lg shadow-md">f(x) = -10(x - 25)² + 56250</p>
+                            <div class="mt-6 pt-4 border-t border-slate-700 font-sans text-base font-bold text-slate-400 bg-slate-800/50 p-4 rounded-xl">
+                                由頂點式可知，當降價 <strong class="text-orange-400">x = 25</strong> 時，擁有最大總收入 <strong class="text-orange-400">56,250</strong>。<br>
+                                最佳定價為 100 - 25 = <strong class="text-white text-lg border-b-2 border-orange-500 pb-0.5">$75</strong>。
+                            </div>
+                        </div>
+
+                        <!-- Q&A Section for Step 5 -->
+                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-orange-100 mt-6 relative z-10">
+                            <span class="block font-black text-orange-600 mb-2 text-lg flex items-center gap-2"><span>💡</span> 進階反思</span>
+                            <p class="text-slate-700 font-medium mb-3">如果在未來，球隊每賣出一件球衣，必須額外繳交 10 元的「聯盟抽成費」，我們的「最佳降價策略」會不會受到影響而改變？</p>
+                            <button onclick="toggleAnswer(this)" data-theme="orange" class="text-xs font-bold px-3 py-1 rounded-full transition-colors bg-orange-100 text-orange-700 hover:bg-orange-200">👁️ 顯示解答</button>
+                            <div class="hidden mt-3 p-5 bg-orange-50 border border-orange-200 rounded-xl text-sm text-orange-900 font-medium shadow-inner leading-relaxed">
+                                <strong>解答：答案是「會改變」！</strong><br><br>
+                                <strong>解析：</strong>原本我們只關心「總收入」，但被抽成後，老闆關心的會變成<strong>「總利潤 = 總收入 - 總成本」</strong>。<br>
+                                新的獲利函數會變成 <code>f(x) = (100 - x - 10) * (500 + 10x)</code>。<br>
+                                這個 <code>-10</code> 的出現，會讓整個二次函數方程式重組，經過重新配方法展開後，頂點位置 (也就是最佳的降價幅度 x) 就會跟著偏移。<br>
+                                這也就是大學經濟學與微積分中常常探討的<strong>「邊際利潤最佳化」</strong>核心概念！
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            `;
+            initProfitChart();
+        }
+
+        function toggleMathProof() {
+            const proofDiv = document.getElementById('math-proof');
+            const icon = document.getElementById('proof-icon');
+            if (proofDiv.classList.contains('hidden')) {
+                proofDiv.classList.remove('hidden');
+                proofDiv.classList.add('fade-in');
+                icon.textContent = '-';
+            } else {
+                proofDiv.classList.add('hidden');
+                icon.textContent = '+';
+            }
+        }
+
+        // --- Charts Initialization ---
+        const getSleekGridOptions = () => ({
+            color: 'rgba(203, 213, 225, 0.4)', // slate-300 with opacity
+            tickLength: 0,
+            borderDash: [4, 4]
+        });
+
+        function initParabolaChart() {
+            const ctx = document.getElementById('parabolaChart').getContext('2d');
+
+            const generateData = (a, h, k) => {
+                const data = [];
+                for (let x = -5; x <= 10.01; x += 0.1) {
+                    data.push({ x: parseFloat(x.toFixed(1)), y: a * Math.pow(x - h, 2) + k });
+                }
+                return data;
+            };
+
+            const data = generateData(parabolaState.a, parabolaState.h, parabolaState.k);
+
+            activeChart = new Chart(ctx, {
+                type: 'scatter',
+                data: {
+                    datasets: [
+                        {
+                            label: '軌跡 f(x)',
+                            data: data,
+                            borderColor: '#f97316',
+                            borderWidth: 5,
+                            showLine: true,
+                            pointRadius: 0,
+                            pointHoverRadius: 8,
+                            pointHoverBackgroundColor: '#ffffff',
+                            pointHoverBorderColor: '#f97316',
+                            pointHoverBorderWidth: 3,
+                            tension: 0,
+                            fill: false
+                        },
+                        {
+                            label: '籃框 🎯',
+                            data: [{ x: 8, y: 3 }],
+                            pointStyle: 'rectRounded',
+                            pointRadius: 12,
+                            pointHoverRadius: 16,
+                            backgroundColor: '#ef4444',
+                            borderColor: '#ffffff',
+                            borderWidth: 3,
+                            showLine: false
+                        }
+                    ]
+                },
+                options: {
+                    animation: false,
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            min: -2,
+                            max: 10,
+                            grid: {
+                                color: (ctx) => ctx.tick.value === 0 ? 'rgba(255, 255, 255, 0.9)' : 'rgba(255, 255, 255, 0.25)',
+                                lineWidth: (ctx) => ctx.tick.value === 0 ? 3 : 1,
+                                borderDash: (ctx) => ctx.tick.value === 0 ? [] : [4, 4],
+                                tickLength: 0
+                            },
+                            border: { display: false },
+                            ticks: { color: 'rgba(255,255,255,0.9)', font: { weight: 'bold' }, stepSize: 2 }
+                        },
+                        x: {
+                            type: 'linear',
+                            min: -5,
+                            max: 10,
+                            grid: {
+                                color: (ctx) => ctx.tick.value === 0 ? 'rgba(255, 255, 255, 0.9)' : 'rgba(255, 255, 255, 0.25)',
+                                lineWidth: (ctx) => ctx.tick.value === 0 ? 3 : 1,
+                                borderDash: (ctx) => ctx.tick.value === 0 ? [] : [4, 4],
+                                tickLength: 0
+                            },
+                            border: { display: false },
+                            ticks: { color: 'rgba(255,255,255,0.9)', font: { weight: 'bold' }, stepSize: 2 }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            intersect: false,
+                            callbacks: {
+                                label: (ctx) => {
+                                    if (ctx.datasetIndex === 1) return `目標：籃框 (8, 3)`;
+                                    return `f(${ctx.raw.x}) = ${ctx.raw.y.toFixed(2)}`;
+                                }
+                            },
+                            titleFont: { size: 14 },
+                            bodyFont: { size: 16, weight: 'bold' }
+                        }
+                    }
+                }
+            });
+
+            const updateVisuals = () => {
+                const a = parseFloat(document.getElementById('input-a').value);
+                const h = parseFloat(document.getElementById('input-h').value);
+                const k = parseFloat(document.getElementById('input-k').value);
+
+                parabolaState = { a, h, k };
+
+                document.getElementById('val-a').textContent = a.toFixed(1);
+                document.getElementById('val-h').textContent = h.toFixed(1);
+                document.getElementById('val-k').textContent = k.toFixed(1);
+                document.getElementById('vertex-display').textContent = `(${h}, ${k})`;
+
+                const signH = h >= 0 ? '-' : '+';
+                const signK = k >= 0 ? '+' : '-';
+                document.getElementById('equation-display').textContent =
+                    `f(x) = ${a}(x ${signH} ${Math.abs(h)})² ${signK} ${Math.abs(k)}`;
+
+                activeChart.data.datasets[0].data = generateData(a, h, k);
+                activeChart.update();
+            };
+
+            ['input-a', 'input-h', 'input-k'].forEach(id => {
+                document.getElementById(id).addEventListener('input', updateVisuals);
+            });
+            updateVisuals();
+        }
+
+        function initDomainChart() {
+            const ctx = document.getElementById('domainChart').getContext('2d');
+
+            activeChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [
+                        {
+                            label: 'Full Function',
+                            data: [],
+                            borderColor: '#cbd5e1',
+                            borderDash: [5, 5],
+                            borderWidth: 3,
+                            pointRadius: 0
+                        },
+                        {
+                            label: 'Restricted Domain',
+                            data: [],
+                            borderColor: '#f97316',
+                            borderWidth: 6,
+                            pointRadius: 0,
+                            pointHoverRadius: 8,
+                            tension: 0.4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            min: 0,
+                            max: 20,
+                            grid: {
+                                color: (ctx) => ctx.tick.value === 0 ? 'rgba(15, 23, 42, 0.3)' : 'rgba(15, 23, 42, 0.06)',
+                                lineWidth: (ctx) => ctx.tick.value === 0 ? 2 : 1,
+                                borderDash: (ctx) => ctx.tick.value === 0 ? [] : [4, 4],
+                                tickLength: 0
+                            },
+                            border: { display: false },
+                            ticks: { color: '#64748b', font: { weight: 'bold' }, stepSize: 5 }
+                        },
+                        x: {
+                            grid: {
+                                color: (ctx) => ctx.tick.value === 0 || ctx.tick.label === '0.0' ? 'rgba(15, 23, 42, 0.3)' : 'rgba(15, 23, 42, 0.06)',
+                                lineWidth: (ctx) => ctx.tick.value === 0 || ctx.tick.label === '0.0' ? 2 : 1,
+                                borderDash: (ctx) => ctx.tick.value === 0 || ctx.tick.label === '0.0' ? [] : [4, 4],
+                                tickLength: 0
+                            },
+                            border: { display: false },
+                            ticks: { color: '#64748b', font: { weight: 'bold' } }
+                        }
+                    },
+                    plugins: { tooltip: { mode: 'index', intersect: false, titleFont: { size: 14 }, bodyFont: { size: 16, weight: 'bold' } } }
+                }
+            });
+            updateDomainChartData();
+        }
+
+        function updateDomainChartData() {
+            if (!activeChart) return;
+
+            const xs = [], ys_full = [], ys_restricted = [];
+            const minX = -1, maxX = 7;
+            const domainStart = currentDomainScenario === 'A' ? 0 : 3;
+            const domainEnd = currentDomainScenario === 'A' ? 5 : 6;
+
+            const mainColor = currentDomainScenario === 'A' ? '#f97316' : '#0284c7';
+            activeChart.data.datasets[1].borderColor = mainColor;
+
+            for (let x = minX; x <= maxX; x += 0.2) {
+                const xVal = parseFloat(x.toFixed(1));
+                xs.push(xVal);
+                const y = Math.pow(xVal - 2, 2) + 1;
+                ys_full.push(y);
+                if (xVal >= domainStart && xVal <= domainEnd) {
+                    ys_restricted.push(y);
+                } else {
+                    ys_restricted.push(null);
+                }
+            }
+
+            activeChart.data.labels = xs;
+            activeChart.data.datasets[0].data = ys_full;
+            activeChart.data.datasets[1].data = ys_restricted;
+            activeChart.data.datasets[1].label = `限制範圍 [${domainStart}, ${domainEnd}]`;
+            activeChart.update();
+        }
+
+        function initDeltaChart() {
+            const ctx = document.getElementById('deltaChart').getContext('2d');
+            activeChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: '軌跡 f(x)',
+                        data: [],
+                        borderColor: '#f97316',
+                        borderWidth: 5,
+                        tension: 0.4,
+                        pointRadius: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { min: -4, max: 10, grid: { color: 'rgba(255,255,255,0.4)', tickLength: 0 }, border: { display: false }, ticks: { color: '#0284c7', font: { weight: 'bold' } } },
+                        x: { type: 'linear', min: -4, max: 4, grid: { color: 'rgba(255,255,255,0.4)', tickLength: 0 }, border: { display: false }, ticks: { color: '#0284c7', font: { weight: 'bold' } } }
+                    },
+                    plugins: { legend: { display: false } }
+                }
+            });
+        }
+
+        function updateDiscriminant(caseIdx) {
+            currentDiscriminant = caseIdx;
+
+            const buttons = document.querySelectorAll('.disc-btn');
+            buttons.forEach((btn, idx) => {
+                const title = btn.querySelector('.text-xl');
+                if (idx === caseIdx) {
+                    btn.classList.add('border-orange-500', 'bg-white', 'shadow-md');
+                    btn.classList.remove('border-transparent', 'bg-transparent');
+                    title.classList.add('text-orange-600');
+                    title.classList.remove('text-slate-500');
+                } else {
+                    btn.classList.remove('border-orange-500', 'bg-white', 'shadow-md');
+                    btn.classList.add('border-transparent', 'bg-transparent');
+                    title.classList.remove('text-orange-600');
+                    title.classList.add('text-slate-500');
+                }
+            });
+
+            const xs = [], ys = [];
+            let func, detailHTML, formulaExp, rootClass;
+
+            if (caseIdx === 0) {
+                func = (x) => x * x - 2;
+                detailHTML = `
+                    <p><strong class="text-white font-mono text-lg bg-slate-700 px-2 rounded border border-slate-600">方程式 x² - 2 = 0</strong> <br>擁有 <strong class="text-orange-400">兩個相異實根</strong>。</p>
+                    <p class="mt-4 text-slate-400 border-l-2 border-slate-600 pl-3">圖形穿過 x 軸 (海平面)，產生兩個實體交點。在解不等式時，這兩個交點即為邊界界線。</p>
+                `;
+                rootClass = "text-orange-600";
+                formulaExp = "Δ 為正數，開根號具備實數意義。公式中的「±」將產生兩個不同的座標解。";
+            } else if (caseIdx === 1) {
+                func = (x) => x * x;
+                detailHTML = `
+                    <p><strong class="text-white font-mono text-lg bg-slate-700 px-2 rounded border border-slate-600">方程式 x² = 0</strong> <br>具備 <strong class="text-sky-400">重根</strong>。</p>
+                    <p class="mt-4 text-slate-400 border-l-2 border-slate-600 pl-3">拋物線頂點剛好與 x 軸 (海平面) 相切，僅有一個交點。此狀態下圖形恆在水面之上或剛好觸碰。</p>
+                `;
+                rootClass = "text-slate-400";
+                formulaExp = "Δ 為 0，根號項消去。公式解僅剩下 -b/2a，這正是拋物線頂點的 x 座標！";
+            } else {
+                func = (x) => x * x + 2;
+                detailHTML = `
+                    <p><strong class="text-white font-mono text-lg bg-slate-700 px-2 rounded border border-slate-600">方程式 x² + 2 = 0</strong> <br><strong class="text-rose-400">無實數解</strong>。</p>
+                    <p class="mt-4 text-slate-400 border-l-2 border-slate-600 pl-3">圖形完全懸浮於 x 軸 (海平面) 上方，無任何交點。這在代數上稱為「恆正」狀態。</p>
+                `;
+                rootClass = "text-rose-500 opacity-30";
+                formulaExp = "陷阱！Δ 為負數。在實數世界中，負數無法開根號。代數上的「無解」完美對應幾何上的「無交點」。";
+            }
+
+            const rootEl = document.getElementById('formula-root');
+            if (rootEl) rootEl.className = `${rootClass} font-bold transition-colors`;
+
+            for (let x = -4; x <= 4; x += 0.1) {
+                xs.push(x);
+                ys.push(func(x));
+            }
+
+            activeChart.data.labels = xs;
+            activeChart.data.datasets[0].data = ys;
+            activeChart.update();
+
+            document.getElementById('delta-details').innerHTML = detailHTML;
+            if (document.getElementById('formula-explanation')) {
+                document.getElementById('formula-explanation').textContent = formulaExp;
+            }
+        }
+
+        function initProfitChart() {
+            const ctx = document.getElementById('profitChart').getContext('2d');
+
+            const xs = [], ys = [];
+            for (let x = 0; x <= 60; x += 1) {
+                xs.push(x);
+                ys.push((100 - x) * (500 + 10 * x));
+            }
+
+            activeChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: xs,
+                    datasets: [{
+                        label: 'Total Revenue',
+                        data: ys,
+                        borderColor: '#f97316',
+                        borderWidth: 4,
+                        pointRadius: 0,
+                        pointHoverRadius: 8,
+                        pointHoverBackgroundColor: '#ffffff',
+                        pointHoverBorderColor: '#f97316',
+                        pointHoverBorderWidth: 4,
+                        tension: 0.4,
+                        fill: { target: 'origin', above: 'rgba(249, 115, 22, 0.1)' }
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        tooltip: {
+                            intersect: false,
+                            titleFont: { size: 14 },
+                            bodyFont: { size: 18, weight: 'bold' },
+                            callbacks: { title: (ctx) => `降價 $${ctx[0].label}`, label: (ctx) => `總收入: $${ctx.raw.toLocaleString()}` }
+                        }
+                    },
+                    scales: {
+                        x: { grid: getSleekGridOptions(), border: { display: false }, ticks: { font: { weight: 'bold' } } },
+                        y: { grid: getSleekGridOptions(), border: { display: false }, ticks: { callback: (val) => '$' + (val / 1000) + 'k', font: { weight: 'bold' } } }
+                    }
+                }
+            });
+
+            const input = document.getElementById('price-input');
+            input.addEventListener('input', (e) => {
+                const drop = parseInt(e.target.value);
+                document.getElementById('price-val').textContent = drop;
+
+                const currentPrice = 100 - drop;
+                const currentSales = 500 + (10 * drop);
+                const revenue = currentPrice * currentSales;
+
+                document.getElementById('curr-price').textContent = currentPrice;
+                document.getElementById('curr-sales').textContent = currentSales;
+                document.getElementById('curr-revenue').textContent = revenue.toLocaleString();
+            });
+        }
+
+        // --- Vending Machine Interactive Logic ---
+        window.vendItem = function (btnId) {
+            const outputSlot = document.getElementById('vending-output');
+            const logPanel = document.getElementById('vending-log');
+            const statusLED = document.getElementById('vending-status');
+
+            // Define image assets
+            const imgWater = `<img src="https://images.unsplash.com/photo-1523362628745-0c100150b504?w=150&h=150&fit=crop" class="w-12 h-12 object-cover rounded-lg shadow-md border border-white" alt="礦泉水" onerror="this.outerHTML='<span class=\\'text-5xl\\'>💧</span>'">`;
+            const imgCola = `<img src="https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=150&h=150&fit=crop" class="w-12 h-12 object-cover rounded-lg shadow-md border border-white" alt="可樂" onerror="this.outerHTML='<span class=\\'text-5xl\\'>🥫</span>'">`;
+
+            // Reset UI for new action
+            outputSlot.innerHTML = '';
+            statusLED.classList.replace('bg-green-500', 'bg-yellow-400');
+            statusLED.classList.replace('bg-red-500', 'bg-yellow-400');
+            statusLED.classList.replace('shadow-[0_0_8px_#22c55e]', 'shadow-[0_0_8px_#facc15]');
+            statusLED.classList.replace('shadow-[0_0_8px_#ef4444]', 'shadow-[0_0_8px_#facc15]');
+
+            setTimeout(() => {
+                let resultDisplay = '';
+                let resultName = '';
+                let isFunction = true;
+                let explanation = '';
+                let priceStr = '';
+
+                if (btnId === 'A1') priceStr = '$25';
+                else if (btnId === 'A2') priceStr = '$20';
+                else if (btnId === 'A3') priceStr = '$20';
+                else if (btnId === 'B1') priceStr = '$35';
+                else if (btnId === 'C1') priceStr = '$30';
+                else if (btnId === 'C2') priceStr = '$20';
+
+                if (btnId === 'A1') {
+                    resultDisplay = '<span class="text-5xl">🥤</span>'; resultName = '運動飲料';
+                    explanation = `投入 ${priceStr} 選擇專屬按鈕。標準的「一對一」對應，這是正常的函數！`;
+                } else if (btnId === 'A2') {
+                    resultDisplay = imgWater; resultName = '礦泉水';
+                    explanation = `投入 ${priceStr} 按下 ${btnId} 掉出礦泉水。`;
+                } else if (btnId === 'A3') {
+                    resultDisplay = '<span class="text-5xl">🧃</span>'; resultName = '果汁';
+                    explanation = `投入 ${priceStr} 按下 ${btnId} 掉出果汁。標準的「一對一」對應，這是正常的函數！`;
+                } else if (btnId === 'B1') {
+                    resultDisplay = imgCola; resultName = '可樂';
+                    explanation = `投入 ${priceStr} 選擇專屬按鈕。標準的「一對一」對應，這是正常的函數！`;
+                } else if (btnId === 'C2') {
+                    resultDisplay = '<span class="text-5xl">💨</span>'; resultName = '(無)';
+                    isFunction = false;
+                    explanation = `警告！投入 ${priceStr} 按下 C2 卻什麼都沒掉出來（機器吃錢）。有輸入(x)卻沒有對應的輸出(y)「一對無」，在數學定義上這不算是完整的函數喔！`;
+                } else if (btnId === 'C1') {
+                    // 同時掉出兩樣商品 (一對多)
+                    resultDisplay = '<div class="flex gap-3 items-center"><span class="text-5xl">☕</span><span class="text-5xl">🥤</span></div>';
+                    resultName = '熱咖啡 + 運動飲料';
+                    isFunction = false;
+                    explanation = `警告！投入 ${priceStr} 只按了一次 C1，竟然同時掉出了「${resultName}」！一個輸入(x)卻跑出多個輸出(y)「一對多」，這代表機器大當機了，這絕對不是函數！`;
+                }
+
+                // Drop animation
+                outputSlot.innerHTML = `<div class="animate-drop filter drop-shadow-lg tracking-widest flex items-center justify-center">${resultDisplay}</div>`;
+
+                // LED Status update
+                statusLED.classList.replace('bg-yellow-400', isFunction ? 'bg-green-500' : 'bg-red-500');
+                statusLED.classList.replace('shadow-[0_0_8px_#facc15]', isFunction ? 'shadow-[0_0_8px_#22c55e]' : 'shadow-[0_0_8px_#ef4444]');
+
+                // Update Log
+                logPanel.innerHTML = `
+                    <div class="fade-in bg-white w-full border-l-4 ${isFunction ? 'border-sky-500' : 'border-rose-500'} p-6 rounded-xl shadow-sm text-left">
+                        <div class="flex items-center gap-2 mb-3">
+                            <span class="px-2 py-1 rounded text-xs font-bold font-mono tracking-widest ${isFunction ? 'bg-sky-100 text-sky-700' : 'bg-rose-100 text-rose-700'}">${isFunction ? 'FUNCTION: OK' : 'SYSTEM ERROR'}</span>
+                        </div>
+                        <p class="font-mono text-lg font-black text-slate-800 mb-3 border-b border-slate-100 pb-3">
+                            輸入(x) = <span class="${isFunction ? 'text-sky-600' : 'text-rose-600'}">${btnId} (${priceStr})</span> 
+                            <span class="text-slate-300 mx-2">➔</span> 
+                            輸出(y) = <span class="${isFunction ? 'text-sky-600' : 'text-rose-600'}">${resultName}</span>
+                        </p>
+                        <p class="text-sm font-bold ${isFunction ? 'text-slate-600' : 'text-rose-600'} leading-relaxed">${explanation}</p>
+                    </div>
+                `;
+            }, 600); // Simulated processing time
+        };
+
+        // --- Numerical Machine Logic ---
+        window.runNumericalMachine = function () {
+            const inputEl = document.getElementById('machine-input');
+            const processEl = document.getElementById('machine-process');
+            const outputEl = document.getElementById('machine-output');
+            const machineBox = processEl.parentElement;
+
+            const x = parseFloat(inputEl.value);
+            if (isNaN(x)) return;
+
+            outputEl.textContent = '?';
+            outputEl.className = "w-20 h-[52px] flex items-center justify-center text-3xl font-mono font-black text-slate-300 border-b-4 border-dashed border-slate-300 transition-all duration-300";
+
+            processEl.style.opacity = '1';
+            machineBox.classList.add('border-orange-500', 'shadow-orange-500/30');
+
+            const displayX = x < 0 ? `(${x})` : x;
+            processEl.textContent = `${displayX}² - 4${displayX} + 5`;
+
+            setTimeout(() => {
+                const result = (x * x) - (4 * x) + 5;
+                processEl.style.opacity = '0';
+                machineBox.classList.remove('border-orange-500', 'shadow-orange-500/30');
+
+                outputEl.textContent = result;
+                outputEl.className = "w-20 h-[52px] flex items-center justify-center text-3xl font-mono font-black text-white border-b-4 border-solid border-orange-600 bg-orange-500 rounded transition-all duration-300 transform scale-110 shadow-lg";
+
+                setTimeout(() => outputEl.classList.remove('scale-110'), 200);
+            }, 800);
+        };
+
+        // Start
+        init();
+    </script>
+</body>
+
+</html>
