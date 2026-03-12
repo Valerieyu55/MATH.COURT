@@ -311,6 +311,60 @@
         Chart.defaults.plugins.tooltip.padding = 12;
         Chart.defaults.plugins.tooltip.cornerRadius = 8;
 
+        const axisArrowPlugin = {
+            id: 'axisArrowPlugin',
+            afterDraw(chart) {
+                const { ctx, chartArea: { top, right, bottom, left }, scales: { x, y } } = chart;
+                ctx.save();
+
+                let axisColor = '#94a3b8'; // default slate-400
+                if (chart.canvas.id === 'parabolaChart' || chart.canvas.id === 'deltaChart') {
+                    axisColor = chart.canvas.id === 'parabolaChart' ? 'rgba(255, 255, 255, 0.9)' : '#0284c7';
+                } else if (chart.canvas.id === 'domainChart') {
+                    axisColor = 'rgba(15, 23, 42, 0.3)';
+                }
+
+                // X axis right arrow
+                let yPos;
+                if (y.type === 'category') {
+                    const idx = y.ticks.findIndex(t => parseFloat(t.label) === 0);
+                    if (idx >= 0) yPos = y.getPixelForTick(idx);
+                } else {
+                    yPos = y.getPixelForValue(0);
+                }
+
+                if (typeof yPos === 'number' && yPos >= top && yPos <= bottom) {
+                    ctx.fillStyle = axisColor;
+                    ctx.beginPath();
+                    ctx.moveTo(right, yPos);
+                    ctx.lineTo(right - 10, yPos - 5);
+                    ctx.lineTo(right - 10, yPos + 5);
+                    ctx.fill();
+                }
+
+                // Y axis top arrow
+                let xPos;
+                if (x.type === 'category') {
+                    const idx = x.ticks.findIndex(t => parseFloat(t.label) === 0);
+                    if (idx >= 0) xPos = x.getPixelForTick(idx);
+                } else {
+                    xPos = x.getPixelForValue(0);
+                }
+
+                if (typeof xPos === 'number' && xPos >= left && xPos <= right) {
+                    ctx.fillStyle = axisColor;
+                    ctx.beginPath();
+                    ctx.moveTo(xPos, top);
+                    ctx.lineTo(xPos - 5, top + 10);
+                    ctx.lineTo(xPos + 5, top + 10);
+                    ctx.fill();
+                }
+
+                ctx.restore();
+            }
+        };
+        Chart.register(axisArrowPlugin);
+
         // --- Core Logic ---
         function init() {
             renderNav();
@@ -936,10 +990,6 @@
                         <div class="grid grid-cols-1 lg:grid-cols-5 gap-8 items-stretch">
                              <div class="lg:col-span-3 chart-container bg-theme-grid-light rounded-2xl overflow-hidden border-4 border-white shadow-lg relative">
                                 <canvas id="deltaChart" class="relative z-10"></canvas>
-                                <!-- Fake water overlay for x-axis -->
-                                <div class="absolute bottom-0 left-0 w-full h-1/2 bg-sky-500/10 border-t-2 border-sky-400 z-0 flex justify-center">
-                                    <span class="text-sky-600 font-bold text-xs mt-1 tracking-widest bg-white/50 px-2 rounded-full h-fit">X-AXIS (y=0)</span>
-                                </div>
                             </div>
                             
                             <div class="lg:col-span-2 flex flex-col gap-6">
@@ -1312,14 +1362,14 @@
         function initDeltaChart() {
             const ctx = document.getElementById('deltaChart').getContext('2d');
             activeChart = new Chart(ctx, {
-                type: 'line',
+                type: 'scatter',
                 data: {
-                    labels: [],
                     datasets: [{
                         label: '軌跡 f(x)',
                         data: [],
                         borderColor: '#f97316',
                         borderWidth: 5,
+                        showLine: true,
                         tension: 0.4,
                         pointRadius: 0
                     }]
@@ -1328,8 +1378,8 @@
                     responsive: true,
                     maintainAspectRatio: false,
                     scales: {
-                        y: { min: -4, max: 10, grid: { color: 'rgba(255,255,255,0.4)', tickLength: 0 }, border: { display: false }, ticks: { color: '#0284c7', font: { weight: 'bold' } } },
-                        x: { type: 'linear', min: -4, max: 4, grid: { color: 'rgba(255,255,255,0.4)', tickLength: 0 }, border: { display: false }, ticks: { color: '#0284c7', font: { weight: 'bold' } } }
+                        y: { min: -4, max: 20, grid: { color: (ctx) => ctx.tick.value === 0 ? '#0284c7' : 'rgba(255,255,255,0.4)', lineWidth: (ctx) => ctx.tick.value === 0 ? 3 : 1, tickLength: 0 }, border: { display: false }, ticks: { color: '#0284c7', font: { weight: 'bold' }, stepSize: 4 } },
+                        x: { type: 'linear', min: -4, max: 4, grid: { color: (ctx) => ctx.tick.value === 0 ? '#0284c7' : 'rgba(255,255,255,0.4)', lineWidth: (ctx) => ctx.tick.value === 0 ? 3 : 1, tickLength: 0 }, border: { display: false }, ticks: { color: '#0284c7', font: { weight: 'bold' }, stepSize: 1 } }
                     },
                     plugins: { legend: { display: false } }
                 }
@@ -1387,13 +1437,12 @@
             const rootEl = document.getElementById('formula-root');
             if (rootEl) rootEl.className = `${rootClass} font-bold transition-colors`;
 
-            for (let x = -4; x <= 4; x += 0.1) {
-                xs.push(x);
-                ys.push(func(x));
+            const dataPts = [];
+            for (let x = -4; x <= 4.01; x += 0.1) {
+                dataPts.push({ x: parseFloat(x.toFixed(1)), y: func(x) });
             }
 
-            activeChart.data.labels = xs;
-            activeChart.data.datasets[0].data = ys;
+            activeChart.data.datasets[0].data = dataPts;
             activeChart.update();
 
             document.getElementById('delta-details').innerHTML = detailHTML;
