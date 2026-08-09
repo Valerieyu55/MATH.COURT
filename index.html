@@ -363,7 +363,115 @@
                 ctx.restore();
             }
         };
-        Chart.register(axisArrowPlugin);
+
+        const profitMarkerPlugin = {
+            id: 'profitMarkerPlugin',
+            afterDraw(chart) {
+                if (chart.canvas.id !== 'profitChart') return;
+
+                const inputEl = document.getElementById('price-input');
+                if (!inputEl) return;
+
+                const drop = parseInt(inputEl.value) || 0;
+                const revenue = (100 - drop) * (500 + 10 * drop);
+                const { ctx, chartArea, scales: { x, y } } = chart;
+                if (!x || !y || !chartArea) return;
+
+                const xPixel = x.getPixelForValue(drop);
+                const yPixel = y.getPixelForValue(revenue);
+
+                if (typeof xPixel !== 'number' || typeof yPixel !== 'number' || isNaN(xPixel) || isNaN(yPixel)) return;
+
+                // Save clean state for our drawing
+                ctx.save();
+
+                // 1. Vertical dashed line to X-axis
+                ctx.beginPath();
+                ctx.setLineDash([4, 4]);
+                ctx.strokeStyle = 'rgba(249, 115, 22, 0.5)';
+                ctx.lineWidth = 2;
+                ctx.moveTo(xPixel, chartArea.bottom);
+                ctx.lineTo(xPixel, yPixel);
+                ctx.stroke();
+
+                // 2. Horizontal dashed line to Y-axis
+                ctx.beginPath();
+                ctx.setLineDash([4, 4]);
+                ctx.strokeStyle = 'rgba(249, 115, 22, 0.5)';
+                ctx.lineWidth = 2;
+                ctx.moveTo(chartArea.left, yPixel);
+                ctx.lineTo(xPixel, yPixel);
+                ctx.stroke();
+
+                // 3. Glowing outer circle
+                ctx.beginPath();
+                ctx.setLineDash([]);
+                ctx.arc(xPixel, yPixel, 11, 0, 2 * Math.PI);
+                ctx.fillStyle = '#f97316';
+                ctx.shadowColor = 'rgba(249, 115, 22, 0.8)';
+                ctx.shadowBlur = 12;
+                ctx.fill();
+
+                // 4. Inner white stroke ring
+                ctx.beginPath();
+                ctx.arc(xPixel, yPixel, 8, 0, 2 * Math.PI);
+                ctx.strokeStyle = '#ffffff';
+                ctx.lineWidth = 3;
+                ctx.shadowBlur = 0;
+                ctx.stroke();
+
+                // 5. White center dot
+                ctx.beginPath();
+                ctx.arc(xPixel, yPixel, 3, 0, 2 * Math.PI);
+                ctx.fillStyle = '#ffffff';
+                ctx.fill();
+
+                // 6. Floating badge above the point
+                const labelText = `降價 $${drop} ➔ 總收入 $${revenue.toLocaleString()}`;
+                ctx.font = 'bold 13px "JetBrains Mono", sans-serif';
+                const textWidth = ctx.measureText(labelText).width;
+                const padding = 10;
+                const badgeW = textWidth + padding * 2;
+                const badgeH = 28;
+                let badgeX = xPixel - badgeW / 2;
+                let badgeY = yPixel - 38;
+
+                // Clamp badge within chartArea bounds
+                const minX = chartArea.left + 5;
+                const maxX = chartArea.right - badgeW - 5;
+                badgeX = Math.max(minX, Math.min(badgeX, maxX));
+                if (badgeY < chartArea.top + 5) badgeY = yPixel + 16;
+
+                // Draw rounded badge rect
+                ctx.fillStyle = '#0f172a';
+                ctx.shadowColor = 'rgba(15, 23, 42, 0.4)';
+                ctx.shadowBlur = 8;
+
+                ctx.beginPath();
+                const r = 6;
+                ctx.moveTo(badgeX + r, badgeY);
+                ctx.lineTo(badgeX + badgeW - r, badgeY);
+                ctx.quadraticCurveTo(badgeX + badgeW, badgeY, badgeX + badgeW, badgeY + r);
+                ctx.lineTo(badgeX + badgeW, badgeY + badgeH - r);
+                ctx.quadraticCurveTo(badgeX + badgeW, badgeY + badgeH, badgeX + badgeW - r, badgeY + badgeH);
+                ctx.lineTo(badgeX + r, badgeY + badgeH);
+                ctx.quadraticCurveTo(badgeX, badgeY + badgeH, badgeX, badgeY + badgeH - r);
+                ctx.lineTo(badgeX, badgeY + r);
+                ctx.quadraticCurveTo(badgeX, badgeY, badgeX + r, badgeY);
+                ctx.closePath();
+                ctx.fill();
+
+                // Badge text
+                ctx.shadowBlur = 0;
+                ctx.fillStyle = '#fb923c'; // orange-400
+                ctx.textAlign = 'left';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(labelText, badgeX + padding, badgeY + badgeH / 2);
+
+                ctx.restore();
+            }
+        };
+        Chart.register(axisArrowPlugin, profitMarkerPlugin);
 
         // --- Core Logic ---
         function init() {
@@ -1260,7 +1368,7 @@
                     `f(x) = ${a}(x ${signH} ${Math.abs(h)})² ${signK} ${Math.abs(k)}`;
 
                 activeChart.data.datasets[0].data = generateData(a, h, k);
-                activeChart.update();
+                activeChart.update('none');
             };
 
             ['input-a', 'input-h', 'input-k'].forEach(id => {
@@ -1454,51 +1562,88 @@
         function initProfitChart() {
             const ctx = document.getElementById('profitChart').getContext('2d');
 
-            const xs = [], ys = [];
-            for (let x = 0; x <= 60; x += 1) {
-                xs.push(x);
-                ys.push((100 - x) * (500 + 10 * x));
-            }
+            const generateProfitData = () => {
+                const pts = [];
+                for (let x = 0; x <= 60; x += 0.5) {
+                    pts.push({ x: x, y: (100 - x) * (500 + 10 * x) });
+                }
+                return pts;
+            };
 
             activeChart = new Chart(ctx, {
-                type: 'line',
+                type: 'scatter',
                 data: {
-                    labels: xs,
-                    datasets: [{
-                        label: 'Total Revenue',
-                        data: ys,
-                        borderColor: '#f97316',
-                        borderWidth: 4,
-                        pointRadius: 0,
-                        pointHoverRadius: 8,
-                        pointHoverBackgroundColor: '#ffffff',
-                        pointHoverBorderColor: '#f97316',
-                        pointHoverBorderWidth: 4,
-                        tension: 0.4,
-                        fill: { target: 'origin', above: 'rgba(249, 115, 22, 0.1)' }
-                    }]
+                    datasets: [
+                        {
+                            label: '總收入曲線',
+                            data: generateProfitData(),
+                            borderColor: '#f97316',
+                            borderWidth: 4,
+                            showLine: true,
+                            pointRadius: 0,
+                            pointHoverRadius: 0,
+                            tension: 0.4,
+                            fill: { target: 'origin', above: 'rgba(249, 115, 22, 0.1)' }
+                        },
+                        {
+                            label: '當前獲利點 📍',
+                            data: [{ x: 0, y: 50000 }],
+                            pointBackgroundColor: '#f97316',
+                            pointBorderColor: '#ffffff',
+                            pointBorderWidth: 3.5,
+                            pointRadius: 10,
+                            pointHoverRadius: 14,
+                            showLine: false
+                        }
+                    ]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    animation: false,
+                    scales: {
+                        x: {
+                            type: 'linear',
+                            min: 0,
+                            max: 60,
+                            grid: getSleekGridOptions(),
+                            border: { display: false },
+                            ticks: {
+                                font: { weight: 'bold' },
+                                stepSize: 6,
+                                callback: (val) => '$' + val
+                            }
+                        },
+                        y: {
+                            min: 44000,
+                            max: 58000,
+                            grid: getSleekGridOptions(),
+                            border: { display: false },
+                            ticks: {
+                                font: { weight: 'bold' },
+                                callback: (val) => '$' + (val / 1000) + 'k'
+                            }
+                        }
+                    },
                     plugins: {
+                        legend: { display: false },
                         tooltip: {
                             intersect: false,
                             titleFont: { size: 14 },
                             bodyFont: { size: 18, weight: 'bold' },
-                            callbacks: { title: (ctx) => `降價 $${ctx[0].label}`, label: (ctx) => `總收入: $${ctx.raw.toLocaleString()}` }
+                            callbacks: {
+                                title: (ctx) => `降價 $${ctx[0].raw.x}`,
+                                label: (ctx) => `總收入: $${ctx.raw.y.toLocaleString()}`
+                            }
                         }
-                    },
-                    scales: {
-                        x: { grid: getSleekGridOptions(), border: { display: false }, ticks: { font: { weight: 'bold' } } },
-                        y: { grid: getSleekGridOptions(), border: { display: false }, ticks: { callback: (val) => '$' + (val / 1000) + 'k', font: { weight: 'bold' } } }
                     }
-                }
+                },
+                plugins: [profitMarkerPlugin]
             });
 
             const input = document.getElementById('price-input');
-            input.addEventListener('input', (e) => {
-                const drop = parseInt(e.target.value);
+            const updateProfitVisuals = () => {
+                const drop = parseInt(input.value);
                 document.getElementById('price-val').textContent = drop;
 
                 const currentPrice = 100 - drop;
@@ -1508,7 +1653,15 @@
                 document.getElementById('curr-price').textContent = currentPrice;
                 document.getElementById('curr-sales').textContent = currentSales;
                 document.getElementById('curr-revenue').textContent = revenue.toLocaleString();
-            });
+
+                if (activeChart) {
+                    activeChart.data.datasets[1].data = [{ x: drop, y: revenue }];
+                    activeChart.update('none');
+                }
+            };
+
+            input.addEventListener('input', updateProfitVisuals);
+            updateProfitVisuals();
         }
 
         // --- Vending Machine Interactive Logic ---
